@@ -1,0 +1,2111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Anaes Kit</title>
+<meta name="theme-color" content="#f5f4f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121211" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Anaes Kit">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f5f4f1; --surface:#fcfcfb; --surface-2:#f0efec; --line:#e2e0db; --line-2:#d3d1cb;
+  --ink:#0b0b0b; --ink-2:#52514e; --ink-3:#7a7974;
+  --accent:#2a78d6; --accent-ink:#ffffff; --accent-soft:#e3eefb;
+  --crit:#d03b3b; --crit-soft:#fbeaea; --good:#0a7d0a; --good-soft:#e5f4e5; --warn-soft:#fdf3dc; --warn-ink:#7a5200;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300;
+  --radius:12px; --shadow:0 1px 2px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.04);
+  --tabh:64px;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    color-scheme: dark;
+    --bg:#121211; --surface:#1a1a19; --surface-2:#232321; --line:#2e2e2b; --line-2:#3a3a36;
+    --ink:#f0efec; --ink-2:#c3c2b7; --ink-3:#8f8e86;
+    --accent:#3987e5; --accent-ink:#ffffff; --accent-soft:#1b2a3d;
+    --crit:#e66767; --crit-soft:#3a1f1f; --good:#4cc24c; --good-soft:#1c2e1c; --warn-soft:#33290f; --warn-ink:#f2c35a;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300;
+    --shadow:none;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+.num,.tab-num{font-variant-numeric:tabular-nums}
+a{color:var(--accent)}
+
+/* ---------- shell ---------- */
+.app{min-height:100vh;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid var(--line);padding:calc(env(safe-area-inset-top) + 10px) 16px 10px;display:flex;align-items:center;gap:12px}
+.brand{font-weight:700;letter-spacing:-.01em;font-size:17px;display:flex;align-items:center;gap:8px}
+.brand-mark{width:22px;height:22px;border-radius:6px;background:var(--accent);display:grid;place-items:center;color:#fff;font-size:13px;font-weight:800}
+.topnav{display:none;gap:4px;margin-left:24px}
+.topnav a{padding:7px 12px;border-radius:8px;text-decoration:none;color:var(--ink-2);font-weight:500}
+.topnav a.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);border:1px solid var(--line)}
+.sync-pill{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-2);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 10px;cursor:pointer}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ink-3)}
+.dot.ok{background:var(--good)} .dot.err{background:var(--crit)} .dot.busy{background:var(--accent);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.35}}
+main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:16px 16px calc(var(--tabh) + env(safe-area-inset-bottom) + 24px)}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom)}
+.tabbar a{height:var(--tabh);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:var(--ink-3);font-size:11px;font-weight:600}
+.tabbar a svg{width:24px;height:24px}
+.tabbar a.on{color:var(--accent)}
+@media (min-width:900px){
+  .topnav{display:flex} .tabbar{display:none}
+  main{padding-bottom:40px}
+}
+
+/* ---------- generic ---------- */
+h1{font-size:24px;letter-spacing:-.02em;margin:4px 0 14px}
+h2{font-size:17px;margin:0 0 10px;letter-spacing:-.01em}
+h3{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin:18px 0 8px;font-weight:700}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.pad{padding:14px 16px}
+.muted{color:var(--ink-2)} .faint{color:var(--ink-3)}
+.small{font-size:13px} .tiny{font-size:12px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.spacer{flex:1}
+.btn{appearance:none;border:1px solid var(--line-2);background:var(--surface);border-radius:10px;padding:9px 14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;min-height:40px}
+.btn:hover{border-color:var(--ink-3)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.danger{color:var(--crit);border-color:color-mix(in srgb,var(--crit) 40%,var(--line))}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn.sm{min-height:32px;padding:5px 10px;font-size:13px;border-radius:8px}
+.btn:disabled{opacity:.5;cursor:default}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line-2);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;color:var(--ink-2)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--ink-2);white-space:nowrap}
+.badge.good{background:var(--good-soft);color:var(--good)}
+.badge.warn{background:var(--warn-soft);color:var(--warn-ink)}
+.badge.crit{background:var(--crit-soft);color:var(--crit)}
+.badge.acc{background:var(--accent-soft);color:var(--accent)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:3px;flex:none}
+input[type=text],input[type=number],input[type=date],input[type=password],input[type=search],select,textarea{width:100%;border:1px solid var(--line-2);background:var(--surface);border-radius:10px;padding:9px 11px;min-height:42px;outline:none;font-size:16px}
+textarea{min-height:70px;resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+label.f{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:4px}
+.field{margin-bottom:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.seg{display:flex;border:1px solid var(--line-2);border-radius:10px;overflow:hidden;background:var(--surface)}
+.seg button{flex:1;border:0;background:transparent;padding:9px 8px;font-weight:600;font-size:13.5px;cursor:pointer;color:var(--ink-2);min-height:40px;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--ink);color:var(--surface)}
+.checks{display:flex;flex-wrap:wrap;gap:6px}
+.checks label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-2);border-radius:999px;padding:6px 11px;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink-2);background:var(--surface)}
+.checks input{display:none}
+.checks label:has(input:checked){background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.empty{text-align:center;padding:40px 16px;color:var(--ink-2)}
+.notice{border-radius:10px;padding:10px 12px;font-size:13px;background:var(--warn-soft);color:var(--warn-ink);display:flex;gap:8px;align-items:flex-start}
+.notice.info{background:var(--accent-soft);color:var(--ink)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--tabh) + env(safe-area-inset-bottom) + 84px);background:var(--ink);color:var(--surface);padding:10px 16px;border-radius:10px;font-size:14px;font-weight:600;z-index:100;box-shadow:0 6px 24px rgba(0,0,0,.2);max-width:90vw}
+@media (min-width:900px){.toast{bottom:24px}}
+
+/* ---------- drugs ---------- */
+.pt-bar{padding:12px 14px;margin-bottom:12px}
+.pt-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.pt-grid input,.pt-grid select{min-height:38px;padding:6px 9px}
+.pt-derived{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.searchbox{position:relative;margin-bottom:10px}
+.searchbox input{padding-left:38px;min-height:46px;font-size:16px;border-radius:12px}
+.searchbox svg{position:absolute;left:12px;top:13px;width:20px;height:20px;color:var(--ink-3)}
+.drug-layout{display:block}
+.drug-list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.drug-item{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;text-decoration:none;color:inherit}
+.drug-item:hover{border-color:var(--line-2)}
+.drug-item.on{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 25%,transparent)}
+.drug-item .nm{font-weight:650}
+.drug-item .cl{font-size:12.5px;color:var(--ink-3)}
+.drug-item .chev{margin-left:auto;color:var(--ink-3)}
+@media (min-width:900px){
+  .drug-layout{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
+  .drug-side{position:sticky;top:76px;max-height:calc(100vh - 96px);overflow:auto;padding-right:4px}
+  .drug-detail-wrap{min-height:60vh}
+  .back-link{display:none!important}
+}
+@media (max-width:899px){
+  .drug-layout.detail-open .drug-side{display:none}
+  .drug-layout:not(.detail-open) .drug-detail-wrap{display:none}
+}
+.dd-head{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.dd-title{font-size:24px;font-weight:750;letter-spacing:-.02em;margin:0}
+.dd-aka{color:var(--ink-3);font-size:13.5px;margin-top:2px}
+.dose-line{padding:10px 0;border-top:1px solid var(--line)}
+.dose-line:first-child{border-top:0}
+.dose-ind{font-weight:650;font-size:14px}
+.dose-txt{color:var(--ink-2);font-size:14px;margin-top:1px}
+.calc{margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.calc .res{background:var(--accent-soft);color:var(--ink);border-radius:8px;padding:4px 9px;font-size:13.5px;font-weight:650;font-variant-numeric:tabular-nums}
+.calc .vol{background:var(--surface-2);border-radius:8px;padding:4px 9px;font-size:13px;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.calc .wnote{font-size:12px;color:var(--ink-3)}
+.calc .icin{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--ink-3)}
+.calc .icin input{width:78px;min-height:28px;padding:2px 6px;font-size:13px;border-radius:6px}
+.dose-line.max .dose-ind{color:var(--crit)}
+.dose-line.max .calc .res{background:var(--crit-soft);color:var(--crit)}
+.maxbox{border:1px solid color-mix(in srgb,var(--crit) 45%,var(--line));background:var(--crit-soft);border-radius:10px;padding:10px 12px;font-size:14px}
+.maxbox b{color:var(--crit)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--surface-2);border-radius:10px;padding:10px 12px}
+.tile .k{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);font-weight:700}
+.tile .v{font-weight:650;margin-top:2px;font-size:14px}
+.prose{font-size:14.5px;color:var(--ink)}
+.sec{margin-top:14px}
+.verify-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+
+/* ---------- log ---------- */
+.log-month{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);font-weight:700;margin:18px 2px 8px}
+.entry{display:flex;gap:12px;padding:12px 14px;cursor:pointer;align-items:flex-start;margin-bottom:6px}
+.entry:hover{border-color:var(--line-2)}
+.entry .cat-bar{width:4px;align-self:stretch;border-radius:4px;flex:none}
+.entry .e-main{flex:1;min-width:0}
+.entry .e-title{font-weight:650}
+.entry .e-sub{font-size:13px;color:var(--ink-2);margin-top:1px}
+.entry .e-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.entry .e-date{font-size:12.5px;color:var(--ink-3);white-space:nowrap;font-variant-numeric:tabular-nums}
+.fab{position:fixed;right:18px;bottom:calc(var(--tabh) + env(safe-area-inset-bottom) + 16px);z-index:25;border-radius:999px;min-height:52px;padding:0 20px;font-size:15px;box-shadow:0 6px 20px color-mix(in srgb,var(--accent) 40%,transparent)}
+@media (min-width:900px){.fab{position:static;box-shadow:none}}
+
+/* ---------- sheet (modal) ---------- */
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:60;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--bg);width:100%;max-width:640px;max-height:94vh;border-radius:18px 18px 0 0;display:flex;flex-direction:column;overflow:hidden}
+@media (min-width:700px){.sheet-bg{align-items:center}.sheet{border-radius:18px;max-height:90vh}}
+.sheet-head{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
+.sheet-head h2{margin:0}
+.sheet-body{overflow:auto;padding:16px;-webkit-overflow-scrolling:touch}
+.sheet-foot{display:flex;gap:8px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--surface)}
+.fs{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px;background:var(--surface)}
+.fs-t{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);font-weight:700;margin-bottom:10px}
+
+/* ---------- dashboard ---------- */
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+@media (min-width:700px){.kpis{grid-template-columns:repeat(4,1fr)}}
+.kpi{padding:14px 16px}
+.kpi .k{font-size:12px;color:var(--ink-2);font-weight:600}
+.kpi .v{font-size:30px;font-weight:750;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:2px;line-height:1.1}
+.kpi .s{font-size:12px;color:var(--ink-3);margin-top:2px}
+.dash-grid{display:grid;gap:14px}
+@media (min-width:900px){.dash-grid{grid-template-columns:1fr 1fr}.dash-grid .wide{grid-column:1/-1}}
+.hbar{display:grid;grid-template-columns:minmax(90px,38%) 1fr auto;gap:10px;align-items:center;padding:5px 0;font-size:13.5px}
+.hbar .lab{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:7px}
+.hbar .track{height:14px;position:relative}
+.hbar .fill{height:100%;border-radius:0 4px 4px 0;min-width:2px}
+.hbar .cnt{font-variant-numeric:tabular-nums;font-weight:650;min-width:2ch;text-align:right}
+.legend{display:flex;flex-wrap:wrap;gap:10px 14px;font-size:12.5px;color:var(--ink-2);margin:4px 0 8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.chart-wrap{position:relative}
+.chart-wrap svg{display:block;width:100%;height:auto;overflow:visible}
+.chart-wrap .grid line{stroke:var(--line);stroke-width:1}
+.chart-wrap .axis text{fill:var(--ink-3);font-size:11px;font-family:var(--font)}
+.tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--line-2);border-radius:10px;padding:8px 10px;font-size:12.5px;box-shadow:0 6px 24px rgba(0,0,0,.14);min-width:140px;z-index:5}
+.tip .tt{font-weight:700;margin-bottom:4px}
+.tip .tr{display:flex;align-items:center;gap:6px;justify-content:space-between}
+.tip .tr span:first-child{display:flex;align-items:center;gap:6px;color:var(--ink-2)}
+table.data{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+table.data th,table.data td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right}
+table.data th:first-child,table.data td:first-child{text-align:left}
+table.data th{color:var(--ink-3);font-weight:700;font-size:12px}
+.tbl-scroll{overflow-x:auto}
+
+/* ---------- settings ---------- */
+.set-sec{margin-bottom:14px}
+.kv{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}
+.kv:last-child{border-bottom:0}
+ol.steps{padding-left:20px;margin:6px 0;font-size:14px}
+ol.steps li{margin-bottom:6px}
+code{background:var(--surface-2);padding:1px 5px;border-radius:5px;font-size:13px}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">A</span>Anaes Kit</div>
+    <nav class="topnav">
+      <a href="#drugs" data-v="drugs">Drugs</a><a href="#log" data-v="log">Log</a><a href="#dash" data-v="dash">Dashboard</a><a href="#settings" data-v="settings">Settings</a>
+    </nav>
+    <button class="sync-pill" id="syncpill" aria-label="Sync status"><span class="dot"></span>Local only</button>
+  </header>
+  <main id="main"></main>
+  <nav class="tabbar">
+    <a href="#drugs" data-v="drugs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>Drugs</a>
+    <a href="#log" data-v="log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Log</a>
+    <a href="#dash" data-v="dash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Dashboard</a>
+    <a href="#settings" data-v="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>Settings</a>
+  </nav>
+</div>
+<script>
+/* Anaesthesia drug reference — data file.
+   DRAFT REFERENCE: every entry ships as UNVERIFIED. Check each against your local
+   formulary / product information before relying on it, then mark it verified in-app.
+   Schema:
+   id,n(name),a(aka),c(class),conc(presentation text),
+   cc:[{l,v,u}] concentrations for mL calc (v per mL in mg, or units if u:'units'),
+   d / p: adult / paeds dose lines {i:indication,t:text,k:calc}
+   k:{v:[min,max],u:'mg/kg'|'mcg/kg'|'units/kg'|'mL/kg'|'mcg/kg/min'|'mcg/kg/h'|'mg/kg/h'|'mL/kg/min'|'mcg/min'|'units/min'|'mg/kg/day'|'mg',
+      s:'TBW'|'IBW'|'LBW'|'ABW', cap:max per dose (base unit), ic:infusion conc per mL (base unit), icl:label, x:1 = max/toxic line}
+   mx: max / toxicity text; on: onset; du: duration; ph: pharmacology; ind; ci; nt: notes; src: basis
+*/
+window.DRUGS = [
+/* ================= INDUCTION / SEDATION ================= */
+{id:'propofol',n:'Propofol',a:'Diprivan, Fresofol',c:'Induction / sedation',
+ conc:'10 mg/mL (1%); 20 mg/mL (2%)',cc:[{l:'1%',v:10},{l:'2%',v:20}],
+ d:[{i:'Induction',t:'1.5–2.5 mg/kg IV (LBW); elderly/frail 1–1.5 mg/kg, titrate',k:{v:[1.5,2.5],u:'mg/kg',s:'LBW'}},
+    {i:'TIVA maintenance (manual)',t:'4–12 mg/kg/h (10-8-6 regimen after 1 mg/kg); or TCI Marsh Cp 4–6 mcg/mL / Schnider Ce 3–6 mcg/mL',k:{v:[4,12],u:'mg/kg/h',s:'TBW',ic:10,icl:'1% neat'}},
+    {i:'Sedation',t:'0.5–1 mg/kg bolus titrated, then 1–4 mg/kg/h',k:{v:[1,4],u:'mg/kg/h',s:'TBW',ic:10,icl:'1% neat'}}],
+ p:[{i:'Induction (>1 month)',t:'2.5–3.5 mg/kg IV',k:{v:[2.5,3.5],u:'mg/kg'}},
+    {i:'Maintenance (>3 y)',t:'9–15 mg/kg/h; or TCI Paedfusor / Kataria',k:{v:[9,15],u:'mg/kg/h',ic:10,icl:'1% neat'}}],
+ mx:'No fixed toxic dose. Propofol infusion syndrome (PRIS) risk with >4 mg/kg/h for >48 h (and in children): metabolic acidosis, rhabdomyolysis, hyperK, arrhythmia, cardiac failure.',
+ on:'30–45 s (one arm–brain circulation)',du:'5–10 min after bolus (redistribution)',
+ ph:'Phenol derivative (2,6-diisopropylphenol); positive allosteric modulator at GABA-A (β subunit). Clearance exceeds hepatic blood flow — extrahepatic (lung, kidney) metabolism; conjugated to inactive glucuronides. Context-sensitive half-time ~10 min at 3 h, ~40 min at 8 h. ↓SVR, ↓BP, ↓contractility, blunted baroreflex; dose-dependent respiratory depression/apnoea; suppresses laryngeal reflexes (good for LMA); antiemetic, antipruritic.',
+ ind:'Induction and maintenance of GA (TIVA/TCI); procedural and ICU sedation.',
+ ci:'Hypersensitivity to propofol or excipients. Egg/soy/peanut allergy is NOT a contraindication per current evidence. Caution: hypovolaemia, fixed cardiac output (severe AS), elderly, ICU sedation in <16 y (licence).',
+ nt:'Pain on injection — large vein, lidocaine 20–40 mg pre-treatment. Lipid vehicle supports bacterial growth: discard open syringes within 6 h (12 h for infusion sets). Check TCI model and weight/age inputs.',
+ src:'SmPC; Oxford Handbook of Anaesthesia; Miller'},
+{id:'thiopentone',n:'Thiopentone (thiopental)',a:'Pentothal',c:'Induction / sedation',
+ conc:'500 mg powder → 25 mg/mL (2.5%) when made up in 20 mL',cc:[{l:'2.5%',v:25}],
+ d:[{i:'Induction',t:'3–5 mg/kg IV (LBW); reduce in elderly/shocked',k:{v:[3,5],u:'mg/kg',s:'LBW'}},
+    {i:'Status epilepticus (refractory)',t:'3–5 mg/kg bolus then 3–5 mg/kg/h (ICU, EEG-guided)'}],
+ p:[{i:'Induction',t:'5–6 mg/kg IV (neonates 2–4 mg/kg)',k:{v:[5,6],u:'mg/kg'}}],
+ mx:'Intra-arterial injection → crystal formation, intense vasospasm, gangrene (leave cannula in, papaverine/heparin/sympathetic block). Extravasation necrosis (pH 10.5). Zero-order kinetics with large/repeated doses → prolonged sedation.',
+ on:'30 s',du:'5–10 min (redistribution); hangover with repeat doses',
+ ph:'Thiobarbiturate; GABA-A agonist (prolongs channel opening; direct agonist at high doses). pKa 7.6 (~60% unionised at pH 7.4), 80% protein bound. Hepatic oxidation; induces cytochrome P450 and ALA synthetase. ↓CMRO2, ↓ICP, anticonvulsant. Myocardial depression, venodilation; histamine release; bronchospasm possible.',
+ ind:'Induction (classic RSI agent); neuroprotection; refractory status epilepticus.',
+ ci:'Acute porphyrias (absolute); barbiturate hypersensitivity; airway obstruction where GA unsafe. Caution: hypovolaemia, severe CVS disease, asthma.',
+ nt:'Availability limited in many regions. Do not mix with acidic drugs (sux, roc, vecuronium) in the line — precipitates.',
+ src:'SmPC; Oxford Handbook of Anaesthesia'},
+{id:'ketamine',n:'Ketamine',a:'Ketalar; S-ketamine (esketamine) is ~2× potent',c:'Induction / sedation',
+ conc:'10 mg/mL, 50 mg/mL, 100 mg/mL',cc:[{l:'10 mg/mL',v:10},{l:'50 mg/mL',v:50},{l:'100 mg/mL',v:100}],
+ d:[{i:'Induction IV',t:'1–2 mg/kg IV (0.5–1 mg/kg in shocked patients)',k:{v:[1,2],u:'mg/kg',s:'TBW'}},
+    {i:'Induction IM',t:'5–10 mg/kg IM',k:{v:[5,10],u:'mg/kg',s:'TBW'}},
+    {i:'Analgesia bolus',t:'0.1–0.3 mg/kg IV',k:{v:[0.1,0.3],u:'mg/kg',s:'IBW'}},
+    {i:'Analgesic infusion',t:'0.1–0.3 mg/kg/h (perioperative opioid-sparing)',k:{v:[0.1,0.3],u:'mg/kg/h',s:'IBW',ic:1,icl:'1 mg/mL (50 mg/50 mL)'}},
+    {i:'Procedural sedation',t:'0.25–0.5 mg/kg IV titrated'}],
+ p:[{i:'Induction IV',t:'1–2 mg/kg IV',k:{v:[1,2],u:'mg/kg'}},
+    {i:'Sedation IM',t:'4–5 mg/kg IM',k:{v:[4,5],u:'mg/kg'}},
+    {i:'Sedation IV',t:'0.5–1 mg/kg IV titrated',k:{v:[0.5,1],u:'mg/kg'}}],
+ mx:'No defined toxic dose; wide therapeutic index. Emergence phenomena/hallucinations (↓ with benzodiazepine), hypertension, tachycardia, laryngospasm (rare), hypersalivation.',
+ on:'IV 30–60 s; IM 3–5 min',du:'IV 10–15 min (anaesthesia); analgesia longer. IM 15–30 min',
+ ph:'Phencyclidine derivative; non-competitive NMDA antagonist (also opioid, monoaminergic, muscarinic effects). Dissociative anaesthesia. Sympathomimetic (↑HR, ↑BP, ↑CO) via central sympathetic stimulation and ↓catecholamine reuptake — but direct myocardial depressant in catecholamine-depleted patients. Bronchodilator. Airway reflexes relatively preserved; ↑secretions. Hepatic N-demethylation to norketamine (active, ~30% potency).',
+ ind:'Induction in haemodynamic instability/asthma; analgesia (acute, opioid-tolerant); sedation; field/pre-hospital anaesthesia.',
+ ci:'Hypersensitivity; conditions where BP/HR rise is dangerous (severe uncontrolled HTN, severe IHD, aortic dissection, eclampsia/pre-eclampsia — relative); acute psychosis. Raised ICP is no longer considered an absolute CI if ventilation controlled. Open globe (relative).',
+ nt:'Check concentration carefully — 10 vs 100 mg/mL is a common error. Consider glycopyrrolate for secretions.',
+ src:'SmPC; Oxford Handbook of Anaesthesia; Miller'},
+{id:'etomidate',n:'Etomidate',a:'Hypnomidate, Etomidate-Lipuro',c:'Induction / sedation',
+ conc:'2 mg/mL',cc:[{l:'2 mg/mL',v:2}],
+ d:[{i:'Induction',t:'0.2–0.3 mg/kg IV (LBW)',k:{v:[0.2,0.3],u:'mg/kg',s:'LBW'}}],
+ p:[{i:'Induction',t:'0.15–0.3 mg/kg IV',k:{v:[0.15,0.3],u:'mg/kg'}}],
+ mx:'Adrenocortical suppression (11β-hydroxylase inhibition) for 6–24 h after a single dose; infusion associated with ↑mortality in ICU — never infuse.',
+ on:'30–60 s',du:'3–10 min',
+ ph:'Carboxylated imidazole; GABA-A modulator (β2/β3). Cardiovascular stability (minimal ↓SVR/contractility). Hydrolysed by hepatic and plasma esterases. Myoclonus (common), high PONV incidence, pain on injection (less with lipid formulation), thrombophlebitis.',
+ ind:'Induction where haemodynamic stability is the priority (cardiac disease, shock).',
+ ci:'Hypersensitivity; acute porphyria; adrenal insufficiency. Caution: sepsis (adrenal suppression — debated).',
+ nt:'Consider hydrocortisone if adrenal insufficiency suspected post-dose.',
+ src:'SmPC; Oxford Handbook of Anaesthesia'},
+{id:'midazolam',n:'Midazolam',a:'Dormicum, Hypnovel',c:'Induction / sedation',
+ conc:'1 mg/mL, 5 mg/mL; oral 2 mg/mL syrup; buccal 5 mg/mL',cc:[{l:'1 mg/mL',v:1},{l:'5 mg/mL',v:5}],
+ d:[{i:'Sedation / anxiolysis',t:'0.5–2 mg IV increments, titrate (elderly 0.5–1 mg); typical total 0.02–0.05 mg/kg',k:{v:[0.02,0.05],u:'mg/kg',s:'IBW'}},
+    {i:'Co-induction',t:'0.05–0.1 mg/kg IV',k:{v:[0.05,0.1],u:'mg/kg',s:'LBW'}},
+    {i:'Status epilepticus',t:'10 mg IM/buccal (5 mg if <40 kg); IV 0.1–0.2 mg/kg in monitored setting'}],
+ p:[{i:'Premed oral',t:'0.5 mg/kg PO (max 20 mg) 20–30 min pre-op',k:{v:[0.5,0.5],u:'mg/kg',cap:20}},
+    {i:'Intranasal / buccal',t:'0.2–0.3 mg/kg (max 10 mg)',k:{v:[0.2,0.3],u:'mg/kg',cap:10}},
+    {i:'IV sedation',t:'0.05–0.1 mg/kg IV titrated',k:{v:[0.05,0.1],u:'mg/kg'}},
+    {i:'Seizure (buccal)',t:'0.3 mg/kg (max 10 mg)',k:{v:[0.3,0.3],u:'mg/kg',cap:10}}],
+ mx:'No fixed toxic dose; respiratory depression synergistic with opioids. Prolonged effect in elderly, obesity, hepatic/renal impairment, CYP3A4 inhibitors.',
+ on:'IV 1–3 min (peak 5–10 min); oral 15–30 min',du:'30–60 min (single IV dose)',
+ ph:'Imidazobenzodiazepine; ↑frequency of GABA-A channel opening (α1: sedation/amnesia; α2: anxiolysis). Ring open & water-soluble at pH <4, closes to lipid-soluble form at physiological pH. CYP3A4 → α-hydroxymidazolam (active, renally excreted). Anterograde amnesia, anticonvulsant; minimal CVS effect except hypotension in hypovolaemia.',
+ ind:'Premedication, procedural sedation, co-induction, seizures, ICU sedation.',
+ ci:'Severe respiratory failure; myasthenia gravis (caution); hypersensitivity. Interactions: erythromycin/clarithromycin, azoles, protease inhibitors (↑ levels).',
+ nt:'Reversal: flumazenil (shorter acting — watch resedation).',
+ src:'SmPC; BNF/BNFc; APLS'},
+{id:'dexmed',n:'Dexmedetomidine',a:'Precedex, Dexdor',c:'Induction / sedation',
+ conc:'100 mcg/mL concentrate; usually diluted to 4 mcg/mL',cc:[{l:'4 mcg/mL (diluted)',v:0.004},{l:'100 mcg/mL (neat)',v:0.1}],
+ d:[{i:'Loading (optional)',t:'0.5–1 mcg/kg over 10 min (often omitted — bradycardia/biphasic BP)',k:{v:[0.5,1],u:'mcg/kg',s:'IBW'}},
+    {i:'Sedation infusion',t:'0.2–0.7 mcg/kg/h (ICU up to 1.4)',k:{v:[0.2,0.7],u:'mcg/kg/h',s:'IBW',ic:4,icl:'4 mcg/mL'}},
+    {i:'Intraop adjunct',t:'0.25–0.5 mcg/kg bolus slowly, or 0.2–0.7 mcg/kg/h'}],
+ p:[{i:'IV sedation/adjunct',t:'0.5–1 mcg/kg IV over 10 min',k:{v:[0.5,1],u:'mcg/kg'}},
+    {i:'Intranasal premed',t:'1–2 mcg/kg IN (onset 30–45 min)',k:{v:[1,2],u:'mcg/kg'}}],
+ mx:'Bradycardia, sinus arrest, hypotension (or transient hypertension with rapid bolus). Withdrawal agitation/hypertension after prolonged infusion.',
+ on:'IV 5–10 min; IN 30–45 min',du:'1–2 h (t½ ~2 h)',
+ ph:'Highly selective α2-adrenoceptor agonist (α2:α1 ~1600:1). Sedation via locus coeruleus — arousable, resembles natural sleep; minimal respiratory depression. Analgesic- and opioid-sparing. Sympatholysis: ↓HR, ↓BP. Hepatic glucuronidation and CYP2A6.',
+ ind:'ICU and procedural sedation, awake fibreoptic intubation, adjunct to GA, emergence delirium prevention, intranasal premed.',
+ ci:'2nd/3rd-degree heart block (unpaced), uncontrolled hypotension, acute cerebrovascular conditions. Caution: hypovolaemia, β-blockers, severe hepatic impairment.',
+ nt:'',src:'SmPC; Oxford Handbook of Anaesthesia'},
+{id:'clonidine',n:'Clonidine',a:'Catapres',c:'Induction / sedation',
+ conc:'150 mcg/mL',cc:[{l:'150 mcg/mL',v:0.15}],
+ d:[{i:'IV adjunct / sedation',t:'0.5–2 mcg/kg slow IV (adult typically 30–150 mcg)',k:{v:[0.5,2],u:'mcg/kg',s:'IBW',cap:150}},
+    {i:'Perineural adjunct',t:'0.5–1 mcg/kg added to LA (max ~150 mcg)'}],
+ p:[{i:'Premed oral',t:'2–4 mcg/kg PO 45–60 min pre-op',k:{v:[2,4],u:'mcg/kg'}},
+    {i:'IV',t:'1–2 mcg/kg slow IV',k:{v:[1,2],u:'mcg/kg'}},
+    {i:'Caudal adjunct',t:'1–2 mcg/kg with LA',k:{v:[1,2],u:'mcg/kg'}}],
+ mx:'Bradycardia, hypotension, sedation. Rebound hypertension on abrupt cessation of chronic therapy.',
+ on:'IV 10–15 min; oral 30–60 min',du:'4–8 h (t½ 6–23 h)',
+ ph:'α2 agonist (α2:α1 ~200:1). Central sympatholysis, sedation, analgesia (spinal dorsal horn α2). Prolongs neuraxial/perineural block. ~50% hepatic, ~50% renal unchanged.',
+ ind:'Adjunct analgesia/sedation, premedication, prolonging regional blocks, opioid/alcohol withdrawal.',
+ ci:'Bradyarrhythmia, 2nd/3rd-degree heart block, hypersensitivity. Caution: hypovolaemia, renal impairment.',
+ nt:'',src:'SmPC; BNFc'},
+{id:'lorazepam',n:'Lorazepam',a:'Ativan',c:'Induction / sedation',
+ conc:'4 mg/mL',cc:[{l:'4 mg/mL',v:4}],
+ d:[{i:'Status epilepticus',t:'4 mg IV (0.1 mg/kg), repeat once after 10 min',k:{v:[0.1,0.1],u:'mg/kg',s:'TBW',cap:4}},
+    {i:'Premed',t:'1–2 mg PO night before / 2–3 h pre-op'}],
+ p:[{i:'Status epilepticus',t:'0.1 mg/kg IV (max 4 mg), repeat once',k:{v:[0.1,0.1],u:'mg/kg',cap:4}}],
+ mx:'Respiratory depression (synergy with opioids); propylene glycol toxicity with high-dose infusions.',
+ on:'IV 2–3 min (peak ~10 min)',du:'6–8 h (anticonvulsant up to 12–24 h)',
+ ph:'Benzodiazepine; GABA-A modulator. Less lipid soluble than diazepam → slower CNS entry but longer anticonvulsant effect (less redistribution). Glucuronidation only — no active metabolites; useful in hepatic impairment.',
+ ind:'Status epilepticus, premedication, agitation.',
+ ci:'Severe respiratory insufficiency, sleep apnoea, myasthenia gravis.',
+ nt:'Store refrigerated.',src:'BNF; APLS / NICE epilepsy'},
+
+/* ================= OPIOIDS ================= */
+{id:'fentanyl',n:'Fentanyl',a:'Sublimaze',c:'Opioid',
+ conc:'50 mcg/mL',cc:[{l:'50 mcg/mL',v:0.05}],
+ d:[{i:'Induction / intraop',t:'1–3 mcg/kg IV (LBW)',k:{v:[1,3],u:'mcg/kg',s:'LBW'}},
+    {i:'Analgesia titration',t:'0.5–1 mcg/kg (25–50 mcg increments)',k:{v:[0.5,1],u:'mcg/kg',s:'LBW'}},
+    {i:'Cardiac / high-dose',t:'5–20 mcg/kg (historically higher); ventilation required'},
+    {i:'Intrathecal',t:'10–25 mcg (with LA)'},
+    {i:'Epidural',t:'50–100 mcg bolus; infusion 2 mcg/mL in dilute LA'}],
+ p:[{i:'IV',t:'1–2 mcg/kg IV',k:{v:[1,2],u:'mcg/kg'}},
+    {i:'Intranasal',t:'1.5 mcg/kg IN (max 100 mcg)',k:{v:[1.5,1.5],u:'mcg/kg',cap:100}}],
+ mx:'No ceiling — respiratory depression/apnoea dose-related. Chest-wall (truncal) rigidity with rapid large doses. Accumulates with infusion (context-sensitive half-time rises steeply).',
+ on:'IV 2–3 min (peak 3–5 min)',du:'30–60 min (single dose)',
+ ph:'Synthetic phenylpiperidine, µ agonist, ~100× morphine. Highly lipid soluble, pKa 8.4 (~9% unionised). Large Vd; CYP3A4 → norfentanyl (inactive). Bradycardia (vagal); minimal histamine release; CVS stable.',
+ ind:'Intraoperative analgesia, blunting intubation response, neuraxial adjunct, PCA, sedation.',
+ ci:'Hypersensitivity. Caution: CYP3A4 inhibitors, MAOIs, respiratory disease, elderly, head injury (unventilated).',
+ nt:'Reverse with naloxone.',src:'SmPC; Oxford Handbook of Anaesthesia; BNFc'},
+{id:'alfentanil',n:'Alfentanil',a:'Rapifen',c:'Opioid',
+ conc:'500 mcg/mL (2 mL, 10 mL); 5 mg/mL concentrate',cc:[{l:'500 mcg/mL',v:0.5}],
+ d:[{i:'Bolus (intubation response, short procedures)',t:'10–20 mcg/kg IV (5–10 mcg/kg spontaneous breathing)',k:{v:[10,20],u:'mcg/kg',s:'LBW'}},
+    {i:'Infusion',t:'0.5–1 mcg/kg/min (TCI Maitre)',k:{v:[0.5,1],u:'mcg/kg/min',s:'LBW',ic:500,icl:'500 mcg/mL neat'}}],
+ p:[{i:'Bolus',t:'10–20 mcg/kg IV',k:{v:[10,20],u:'mcg/kg'}}],
+ mx:'Respiratory depression/apnoea, muscle rigidity, bradycardia. Variable clearance (CYP3A4 polymorphism).',
+ on:'60–90 s (fastest of the fentanyl group)',du:'5–10 min',
+ ph:'Phenylpiperidine µ agonist, ~10–20× morphine (~1/5–1/10 fentanyl). Low pKa 6.5 → ~89% unionised at pH 7.4 → rapid effect-site equilibration despite lower lipid solubility. Small Vd, high protein binding (α1-acid glycoprotein). CYP3A4.',
+ ind:'Short procedures, attenuating intubation/pressor response, sedation for awake procedures, renal failure (no active metabolites).',
+ ci:'Hypersensitivity. Caution: CYP3A4 inhibitors (erythromycin), respiratory disease.',
+ nt:'',src:'SmPC; Oxford Handbook of Anaesthesia'},
+{id:'remifentanil',n:'Remifentanil',a:'Ultiva',c:'Opioid',
+ conc:'1 mg, 2 mg, 5 mg powder; commonly diluted to 50 mcg/mL (or 20 mcg/mL)',cc:[{l:'50 mcg/mL',v:0.05},{l:'20 mcg/mL',v:0.02}],
+ d:[{i:'Infusion',t:'0.05–0.5 mcg/kg/min (LBW/IBW); TCI Minto Ce 2–8 ng/mL (4–6 for intubation without NMB)',k:{v:[0.05,0.5],u:'mcg/kg/min',s:'LBW',ic:50,icl:'50 mcg/mL'}},
+    {i:'Bolus',t:'0.5–1 mcg/kg over ≥30 s (risk of bradycardia, rigidity)',k:{v:[0.5,1],u:'mcg/kg',s:'LBW'}}],
+ p:[{i:'Infusion (>1 y)',t:'0.05–1 mcg/kg/min',k:{v:[0.05,1],u:'mcg/kg/min',ic:20,icl:'20 mcg/mL'}}],
+ mx:'Apnoea, bradycardia/asystole, chest-wall rigidity with bolus. Acute tolerance/opioid-induced hyperalgesia after high-dose infusions.',
+ on:'~1 min',du:'Offset 3–5 min regardless of infusion duration (CSHT ~3–4 min)',
+ ph:'Anilidopiperidine µ agonist with ester linkage — hydrolysed by non-specific plasma and tissue esterases (NOT plasma cholinesterase) to remifentanil acid (~1/4600 potency). Clearance independent of hepatic/renal function. Small Vd.',
+ ind:'TIVA, intense but short stimulation, sedation-free intubation, awake fibreoptic intubation, labour PCA (specialist protocols).',
+ ci:'Epidural/intrathecal use (formulation contains glycine); hypersensitivity to fentanyl analogues.',
+ nt:'Plan transitional analgesia before stopping (longer-acting opioid/regional). Never flush a line containing remifentanil — unintended bolus. Dead-space: run close to cannula.',
+ src:'SmPC; Oxford Handbook of Anaesthesia'},
+{id:'morphine',n:'Morphine',a:'',c:'Opioid',
+ conc:'10 mg/mL; PCA 1 mg/mL (50 mg/50 mL)',cc:[{l:'10 mg/mL',v:10},{l:'1 mg/mL',v:1}],
+ d:[{i:'IV titration',t:'0.05–0.15 mg/kg total; 1–2 mg increments q5 min',k:{v:[0.05,0.15],u:'mg/kg',s:'IBW'}},
+    {i:'PCA',t:'1 mg bolus, 5 min lockout, no background (typical)'},
+    {i:'Intrathecal',t:'100–150 mcg (Caesarean); 50–200 mcg other surgery'},
+    {i:'Epidural',t:'2–3 mg (single dose)'}],
+ p:[{i:'IV',t:'0.05–0.1 mg/kg titrated (neonates 0.025–0.05)',k:{v:[0.05,0.1],u:'mg/kg'}},
+    {i:'Infusion / NCA',t:'10–40 mcg/kg/h (local protocol)',k:{v:[10,40],u:'mcg/kg/h',ic:1000,icl:'1 mg/mL'}}],
+ mx:'No ceiling. Respiratory depression; delayed respiratory depression up to 12–24 h after neuraxial morphine — monitor per protocol. Accumulation of M6G in renal failure.',
+ on:'IV 5–10 min (peak 15–30 min); IT 30–60 min',du:'3–4 h IV; IT/epidural 12–24 h',
+ ph:'Phenanthrene µ agonist (reference opioid). Low lipid solubility → slow CNS penetration and long neuraxial spread (rostral). Hepatic glucuronidation → M6G (active, more potent, renally excreted) and M3G (neuroexcitatory). Histamine release (hypotension, itch, bronchospasm), nausea, pruritus, urinary retention, ileus.',
+ ind:'Moderate–severe pain, PCA, neuraxial analgesia.',
+ ci:'Respiratory depression, acute severe asthma (relative), paralytic ileus. Caution: renal impairment (prefer fentanyl/oxycodone/hydromorphone), elderly, OSA, head injury.',
+ nt:'',src:'BNF/BNFc; Oxford Handbook of Anaesthesia; OAA'},
+{id:'oxycodone',n:'Oxycodone',a:'OxyNorm (IR), OxyContin (CR)',c:'Opioid',
+ conc:'Oral IR 5 mg, CR 10 mg; IV 10 mg/mL',cc:[{l:'10 mg/mL',v:10}],
+ d:[{i:'Oral IR',t:'5–10 mg PO q4–6h PRN (elderly 2.5–5 mg)'},
+    {i:'IV titration',t:'1–3 mg IV increments'}],
+ p:[{i:'Oral IR',t:'0.1–0.2 mg/kg PO q4–6h (max 5–10 mg/dose)',k:{v:[0.1,0.2],u:'mg/kg',cap:10}}],
+ mx:'No ceiling — respiratory depression. Accumulates in renal/hepatic impairment.',
+ on:'Oral 20–30 min; IV ~5 min',du:'4–6 h (IR); 12 h (CR)',
+ ph:'Semisynthetic µ (and κ) agonist; ~1.5–2× morphine orally. High oral bioavailability (60–87%). CYP3A4 → noroxycodone (main) and CYP2D6 → oxymorphone (active, minor).',
+ ind:'Moderate–severe acute and chronic pain; step-down from PCA.',
+ ci:'Respiratory depression, paralytic ileus, severe hepatic impairment. Caution: renal impairment, CYP3A4 inhibitors.',
+ nt:'',src:'BNF/BNFc'},
+{id:'pethidine',n:'Pethidine (meperidine)',a:'Demerol',c:'Opioid',
+ conc:'50 mg/mL',cc:[{l:'50 mg/mL',v:50}],
+ d:[{i:'Post-op shivering',t:'12.5–25 mg IV'},
+    {i:'Analgesia',t:'25–100 mg IM/slow IV (≈1 mg/kg) q3–4h'}],
+ p:[{i:'Analgesia',t:'0.5–1 mg/kg IV/IM',k:{v:[0.5,1],u:'mg/kg'}}],
+ mx:'Max ~1 g/24 h (local limits often lower). Norpethidine accumulation → seizures (esp. renal impairment, prolonged use). Serotonin syndrome / fatal reactions with MAOIs.',
+ on:'IV ~5 min; IM 10–15 min',du:'2–3 h',
+ ph:'Phenylpiperidine µ and κ agonist, ~1/10 morphine. Anticholinergic (tachycardia, dry mouth), local anaesthetic properties, anti-shivering (κ). Hepatic N-demethylation → norpethidine (neurotoxic, renally excreted, t½ 15–30 h).',
+ ind:'Post-anaesthetic shivering; analgesia (largely superseded).',
+ ci:'MAOIs within 14 days (absolute); severe renal impairment; seizure disorders; phaeochromocytoma.',
+ nt:'',src:'BNF; Oxford Handbook of Anaesthesia'},
+{id:'tramadol',n:'Tramadol',a:'Tramal',c:'Opioid',
+ conc:'50 mg/mL IV; 50 mg capsules',cc:[{l:'50 mg/mL',v:50}],
+ d:[{i:'Analgesia',t:'50–100 mg IV/PO q4–6h'},
+    {i:'Max daily',t:'400 mg/day (300 mg/day if >75 y)',k:{v:[400,400],u:'mg',x:1}}],
+ p:[{i:'Analgesia (>12 y)',t:'1–2 mg/kg (max 100 mg)',k:{v:[1,2],u:'mg/kg',cap:100}}],
+ mx:'Max 400 mg/24 h. Seizures (lowers threshold), serotonin syndrome with SSRIs/SNRIs/MAOIs, hypoglycaemia, hyponatraemia.',
+ on:'IV 10–20 min; oral 30–60 min',du:'4–6 h',
+ ph:'Racemic weak µ agonist + serotonin and noradrenaline reuptake inhibition. CYP2D6 → O-desmethyltramadol (M1; much higher µ affinity) — poor metabolisers get less analgesia; ultra-rapid metabolisers risk toxicity. High PONV.',
+ ind:'Moderate pain; opioid-sparing multimodal analgesia.',
+ ci:'Uncontrolled epilepsy, MAOIs, concurrent serotonergic drugs (caution). Avoid in children <12 y and <18 y after tonsillectomy/adenoidectomy (FDA/EMA — CYP2D6 ultra-rapid metabolism).',
+ nt:'',src:'BNF; FDA/EMA safety communications'},
+
+/* ================= NEUROMUSCULAR BLOCKERS ================= */
+{id:'sux',n:'Suxamethonium (succinylcholine)',a:'Scoline, Anectine',c:'Neuromuscular blocker',
+ conc:'50 mg/mL (100 mg/2 mL)',cc:[{l:'50 mg/mL',v:50}],
+ d:[{i:'Intubation / RSI',t:'1–1.5 mg/kg IV (TBW)',k:{v:[1,1.5],u:'mg/kg',s:'TBW',cap:200}},
+    {i:'Laryngospasm',t:'0.1–0.5 mg/kg IV (small dose); full dose if desaturating',k:{v:[0.1,0.5],u:'mg/kg',s:'TBW'}}],
+ p:[{i:'Infants (<1 y)',t:'2 mg/kg IV',k:{v:[2,2],u:'mg/kg'}},
+    {i:'Children',t:'1–2 mg/kg IV',k:{v:[1,2],u:'mg/kg'}},
+    {i:'IM (no IV access)',t:'4 mg/kg IM (max 150 mg)',k:{v:[4,4],u:'mg/kg',cap:150}}],
+ mx:'Repeated doses/>~5–8 mg/kg cumulative → phase II block, bradycardia (esp. children/second dose — give atropine). Hyperkalaemia (K+ ↑ ~0.5 mmol/L; life-threatening in susceptible patients). MH trigger.',
+ on:'30–60 s',du:'5–10 min (prolonged in plasma cholinesterase deficiency: up to hours)',
+ ph:'Depolarising NMBA — two ACh molecules joined; nicotinic receptor agonist → fasciculation then depolarising (phase I) block. Hydrolysed by plasma cholinesterase (butyrylcholinesterase) → succinylmonocholine → succinic acid + choline. Not reversed by anticholinesterases (may prolong). Side effects: myalgia, ↑IOP/ICP/intragastric pressure, bradycardia, hyperK, anaphylaxis (common NMBA trigger).',
+ ind:'RSI, laryngospasm, short procedures (ECT).',
+ ci:'MH susceptibility; hyperkalaemia; major burns >24–48 h, crush/denervation injuries (spinal cord injury, stroke) after ~72 h, prolonged immobility; muscular dystrophies (Duchenne/Becker — hyperkalaemic arrest); myotonias (masseter/whole-body rigidity); known plasma cholinesterase deficiency; personal/family hx of sux apnoea.',
+ nt:'Store refrigerated (2–8 °C). Plasma cholinesterase reduced in pregnancy, liver disease, neostigmine use. Prolonged block: keep sedated & ventilated, send cholinesterase studies.',
+ src:'SmPC; Oxford Handbook of Anaesthesia; AAGBI MH 2020'},
+{id:'roc',n:'Rocuronium',a:'Esmeron, Zemuron',c:'Neuromuscular blocker',
+ conc:'10 mg/mL',cc:[{l:'10 mg/mL',v:10}],
+ d:[{i:'Intubation',t:'0.6 mg/kg IV (IBW)',k:{v:[0.6,0.6],u:'mg/kg',s:'IBW'}},
+    {i:'RSI',t:'1–1.2 mg/kg IV (IBW)',k:{v:[1,1.2],u:'mg/kg',s:'IBW'}},
+    {i:'Maintenance',t:'0.1–0.2 mg/kg (guided by TOF)',k:{v:[0.1,0.2],u:'mg/kg',s:'IBW'}},
+    {i:'Infusion',t:'0.3–0.6 mg/kg/h',k:{v:[0.3,0.6],u:'mg/kg/h',s:'IBW',ic:10,icl:'10 mg/mL neat'}}],
+ p:[{i:'Intubation',t:'0.6 mg/kg IV',k:{v:[0.6,0.6],u:'mg/kg'}},
+    {i:'RSI',t:'1–1.2 mg/kg IV',k:{v:[1,1.2],u:'mg/kg'}}],
+ mx:'No toxic dose; duration scales with dose. Prolonged in hepatic impairment, elderly, hypothermia, Mg2+, aminoglycosides, volatile agents. Anaphylaxis (relatively high incidence).',
+ on:'0.6 mg/kg: 60–90 s; 1.2 mg/kg: ~60 s',du:'0.6 mg/kg: 30–45 min; 1.2 mg/kg: 60–90 min',
+ ph:'Aminosteroid non-depolarising NMBA (competitive nicotinic antagonist); ED95 ~0.3 mg/kg. Low potency → fast onset (more molecules). Mostly hepatic uptake and biliary excretion unchanged (~30% renal). Mild vagolysis. Pain on injection. Encapsulated by sugammadex.',
+ ind:'Intubation, RSI (with sugammadex available), surgical relaxation.',
+ ci:'Hypersensitivity. Caution: myasthenia (very sensitive — reduce dose, use TOF), hepatic impairment.',
+ nt:'Store refrigerated (room temp for up to 12 weeks).',
+ src:'SmPC; Oxford Handbook of Anaesthesia'},
+{id:'atracurium',n:'Atracurium',a:'Tracrium',c:'Neuromuscular blocker',
+ conc:'10 mg/mL',cc:[{l:'10 mg/mL',v:10}],
+ d:[{i:'Intubation',t:'0.5 mg/kg IV',k:{v:[0.5,0.5],u:'mg/kg',s:'IBW'}},
+    {i:'Maintenance',t:'0.1–0.2 mg/kg',k:{v:[0.1,0.2],u:'mg/kg',s:'IBW'}},
+    {i:'Infusion',t:'0.3–0.6 mg/kg/h',k:{v:[0.3,0.6],u:'mg/kg/h',s:'IBW',ic:10,icl:'10 mg/mL neat'}}],
+ p:[{i:'Intubation (>1 month)',t:'0.3–0.6 mg/kg IV',k:{v:[0.3,0.6],u:'mg/kg'}}],
+ mx:'Histamine release (flushing, hypotension, bronchospasm) with large/rapid doses. Laudanosine (CNS excitation in animals) with prolonged infusion.',
+ on:'2–3 min',du:'20–35 min',
+ ph:'Benzylisoquinolinium non-depolarising NMBA (mixture of 10 isomers). Hofmann elimination (spontaneous, pH- and temperature-dependent; slowed by acidosis/hypothermia) and ester hydrolysis by non-specific esterases. Organ-independent clearance — good in renal/hepatic failure.',
+ ind:'Intubation and relaxation, esp. renal/hepatic impairment.',
+ ci:'Hypersensitivity. Caution: asthma/atopy (histamine), myasthenia.',
+ nt:'Store refrigerated. Reverse with neostigmine (not sugammadex).',
+ src:'SmPC; Oxford Handbook of Anaesthesia'},
+{id:'cisatracurium',n:'Cisatracurium',a:'Nimbex',c:'Neuromuscular blocker',
+ conc:'2 mg/mL; 5 mg/mL',cc:[{l:'2 mg/mL',v:2},{l:'5 mg/mL',v:5}],
+ d:[{i:'Intubation',t:'0.15 mg/kg IV (0.15–0.2)',k:{v:[0.15,0.2],u:'mg/kg',s:'IBW'}},
+    {i:'Maintenance',t:'0.03 mg/kg',k:{v:[0.03,0.03],u:'mg/kg',s:'IBW'}},
+    {i:'Infusion (ICU)',t:'0.06–0.18 mg/kg/h (1–3 mcg/kg/min)',k:{v:[0.06,0.18],u:'mg/kg/h',s:'IBW',ic:2,icl:'2 mg/mL neat'}}],
+ p:[{i:'Intubation (>1 month)',t:'0.1–0.15 mg/kg IV',k:{v:[0.1,0.15],u:'mg/kg'}}],
+ mx:'Minimal histamine release. Prolonged infusion: ICU-acquired weakness (all NMBAs).',
+ on:'3–5 min (faster with 0.2 mg/kg)',du:'~45 min (0.15 mg/kg)',
+ ph:'1R-cis,1′R-cis isomer of atracurium, ~4× more potent. ~77% Hofmann elimination; less laudanosine; negligible histamine release; CVS stable.',
+ ind:'Relaxation in renal/hepatic failure; ICU infusion (e.g., ARDS).',
+ ci:'Hypersensitivity.',
+ nt:'Store refrigerated. Reverse with neostigmine.',
+ src:'SmPC'},
+{id:'vecuronium',n:'Vecuronium',a:'Norcuron',c:'Neuromuscular blocker',
+ conc:'10 mg powder; usually reconstituted to 1 mg/mL (or 2 mg/mL)',cc:[{l:'1 mg/mL',v:1},{l:'2 mg/mL',v:2}],
+ d:[{i:'Intubation',t:'0.1 mg/kg IV',k:{v:[0.1,0.1],u:'mg/kg',s:'IBW'}},
+    {i:'Maintenance',t:'0.02–0.03 mg/kg',k:{v:[0.02,0.03],u:'mg/kg',s:'IBW'}}],
+ p:[{i:'Intubation',t:'0.1 mg/kg IV (prolonged in neonates)',k:{v:[0.1,0.1],u:'mg/kg'}}],
+ mx:'Accumulation of 3-desacetylvecuronium (active) in renal failure/ICU infusions → prolonged weakness.',
+ on:'2–3 min',du:'30–40 min',
+ ph:'Monoquaternary aminosteroid; CVS stable (no vagolysis/histamine). Hepatic deacetylation; biliary > renal excretion. Reversible with sugammadex (lower affinity than rocuronium) or neostigmine.',
+ ind:'Intubation and relaxation where CVS stability needed.',
+ ci:'Hypersensitivity. Caution: hepatic/renal impairment.',
+ nt:'',src:'SmPC'},
+
+/* ================= REVERSAL / ANTAGONISTS ================= */
+{id:'sugammadex',n:'Sugammadex',a:'Bridion',c:'Reversal / antagonist',
+ conc:'100 mg/mL (2 mL, 5 mL)',cc:[{l:'100 mg/mL',v:100}],
+ d:[{i:'Routine (TOF count ≥2)',t:'2 mg/kg IV (actual body weight)',k:{v:[2,2],u:'mg/kg',s:'TBW'}},
+    {i:'Deep block (PTC 1–2)',t:'4 mg/kg IV',k:{v:[4,4],u:'mg/kg',s:'TBW'}},
+    {i:'Immediate reversal (after roc 1.2 mg/kg)',t:'16 mg/kg IV',k:{v:[16,16],u:'mg/kg',s:'TBW'}}],
+ p:[{i:'Routine reversal',t:'2 mg/kg IV (4 mg/kg for deep block). Licensed age ranges differ by region — check local licence',k:{v:[2,4],u:'mg/kg'}}],
+ mx:'No defined toxic dose. Anaphylaxis (rare, dose-related?), marked bradycardia/asystole (rare), transient ↑aPTT/PT. Recurarisation if under-dosed.',
+ on:'TOF ratio 0.9 typically within 2–3 min (2 mg/kg)',du:'Encapsulation essentially irreversible; complex renally excreted',
+ ph:'Modified γ-cyclodextrin; encapsulates aminosteroid NMBAs 1:1 (rocuronium > vecuronium >> pancuronium) creating a concentration gradient that draws NMBA off the receptor. No effect on benzylisoquinoliniums or sux. Renal excretion unchanged.',
+ ind:'Reversal of rocuronium/vecuronium block; CICO/"can\'t intubate" rescue after roc RSI (16 mg/kg).',
+ ci:'Hypersensitivity. Not recommended in severe renal impairment (CrCl <30 mL/min).',
+ nt:'Hormonal contraceptives: treat as one missed pill — use additional contraception for 7 days. Re-blocking within 24 h: use a benzylisoquinolinium (or high-dose roc per SmPC timing). Displacement by toremifene/fusidic acid.',
+ src:'SmPC (Bridion); Oxford Handbook of Anaesthesia'},
+{id:'neostigmine',n:'Neostigmine',a:'',c:'Reversal / antagonist',
+ conc:'2.5 mg/mL (UK/SG); 0.5–1 mg/mL elsewhere',cc:[{l:'2.5 mg/mL',v:2.5}],
+ d:[{i:'NMB reversal (TOF count ≥4 ideally)',t:'0.05 mg/kg IV (typical adult 2.5 mg), with glycopyrrolate 10 mcg/kg or atropine 20 mcg/kg',k:{v:[0.04,0.05],u:'mg/kg',s:'TBW',cap:5}},
+    {i:'Max dose',t:'0.07 mg/kg or 5 mg, whichever is lower',k:{v:[0.07,0.07],u:'mg/kg',s:'TBW',cap:5,x:1}}],
+ p:[{i:'NMB reversal',t:'0.05 mg/kg IV (max 2.5 mg) with glycopyrrolate 10 mcg/kg or atropine 20 mcg/kg',k:{v:[0.05,0.05],u:'mg/kg',cap:2.5}}],
+ mx:'Max 5 mg (0.07 mg/kg) — ceiling effect; more cannot reverse deep block and may cause paradoxical weakness. Unopposed: bradycardia, asystole, bronchospasm, salivation, ↑GI motility, PONV.',
+ on:'1 min; peak 7–10 min',du:'45–60 min',
+ ph:'Quaternary carbamate anticholinesterase — carbamylates acetylcholinesterase, ↑ACh at nicotinic (NMJ) and muscarinic sites. Does not cross BBB. Renal excretion (50%), hepatic metabolism. Also inhibits plasma cholinesterase (prolongs sux/mivacurium).',
+ ind:'Reversal of non-depolarising block (shallow); myasthenia gravis.',
+ ci:'Mechanical GI or urinary obstruction. Caution: asthma, bradyarrhythmia/AV block, recent MI, Parkinson\'s, epilepsy.',
+ nt:'Quantitative TOF ratio ≥0.9 before extubation. Do not give at TOF count <2.',
+ src:'SmPC; Oxford Handbook of Anaesthesia; AoA recommendations NM monitoring 2021'},
+{id:'glyco',n:'Glycopyrrolate (glycopyrronium)',a:'Robinul',c:'Reversal / antagonist',
+ conc:'200 mcg/mL; neostigmine 2.5 mg + glycopyrrolate 0.5 mg combined ampoule (some regions)',cc:[{l:'200 mcg/mL',v:0.2}],
+ d:[{i:'With neostigmine',t:'10 mcg/kg IV (≈200 mcg per 1 mg neostigmine)',k:{v:[10,10],u:'mcg/kg',s:'TBW'}},
+    {i:'Bradycardia / antisialagogue',t:'200–400 mcg IV (4–10 mcg/kg)'}],
+ p:[{i:'Bradycardia / with neostigmine',t:'4–10 mcg/kg IV (max 200 mcg)',k:{v:[4,10],u:'mcg/kg',cap:200}}],
+ mx:'Tachycardia, dry mouth, urinary retention, blurred vision.',
+ on:'IV 1–3 min',du:'Vagolysis 2–4 h; antisialagogue up to 7 h',
+ ph:'Quaternary ammonium antimuscarinic. Does not cross BBB or placenta significantly — no central anticholinergic syndrome. Slower onset than atropine (matches neostigmine). Renal excretion largely unchanged.',
+ ind:'Pairing with neostigmine, bradycardia, secretion reduction (ketamine, awake FOI).',
+ ci:'Narrow-angle glaucoma (relative), tachyarrhythmia, obstructive uropathy, myasthenia gravis (relative).',
+ nt:'',src:'SmPC; BNFc'},
+{id:'atropine',n:'Atropine',a:'',c:'Reversal / antagonist',
+ conc:'600 mcg/mL; 1 mg/mL; prefilled 100 mcg/mL (1 mg/10 mL)',cc:[{l:'600 mcg/mL',v:0.6},{l:'100 mcg/mL',v:0.1}],
+ d:[{i:'Bradycardia (ALS)',t:'500 mcg IV, repeat q3–5 min to max 3 mg',k:{v:[0.5,0.5],u:'mg'}},
+    {i:'With neostigmine',t:'20 mcg/kg IV',k:{v:[20,20],u:'mcg/kg',s:'TBW'}},
+    {i:'Max (full vagal block)',t:'3 mg (≈0.04 mg/kg)',k:{v:[3,3],u:'mg',x:1}},
+    {i:'Organophosphate poisoning',t:'1–2 mg IV, double every 5 min until chest clear, HR >80, SBP >80'}],
+ p:[{i:'Bradycardia',t:'20 mcg/kg IV/IO (max 600 mcg)',k:{v:[20,20],u:'mcg/kg',cap:600}}],
+ mx:'Max 3 mg for vagal blockade (organophosphate poisoning: no ceiling). Central anticholinergic syndrome (confusion, agitation, hyperthermia — treat with physostigmine). Tachyarrhythmias.',
+ on:'IV <1 min',du:'30–60 min (IV vagolysis)',
+ ph:'Tertiary amine antimuscarinic (racemic hyoscyamine) — crosses BBB and placenta. Very low doses can cause paradoxical bradycardia (central vagal stimulation). Bronchodilation, ↓secretions, mydriasis, ↓sweating.',
+ ind:'Bradycardia, with neostigmine, organophosphate poisoning, antisialagogue.',
+ ci:'Narrow-angle glaucoma (relative), tachyarrhythmia, myasthenia gravis, obstructive uropathy — irrelevant in arrest/emergency bradycardia.',
+ nt:'',src:'Resuscitation Council UK ALS/PLS 2021; SmPC'},
+{id:'naloxone',n:'Naloxone',a:'Narcan',c:'Reversal / antagonist',
+ conc:'400 mcg/mL',cc:[{l:'400 mcg/mL',v:0.4},{l:'40 mcg/mL (diluted 400 mcg in 10 mL)',v:0.04}],
+ d:[{i:'Post-op respiratory depression (titrate)',t:'20–100 mcg IV increments q2 min (dilute 400 mcg to 10 mL = 40 mcg/mL)'},
+    {i:'Overdose / arrest-threatening',t:'400 mcg–2 mg IV/IM/IN, repeat q2–3 min (reconsider diagnosis at 10 mg)'},
+    {i:'Infusion',t:'~2/3 of effective bolus dose per hour, titrate'}],
+ p:[{i:'Post-op titration',t:'1 mcg/kg IV, repeat q2–3 min',k:{v:[1,1],u:'mcg/kg'}},
+    {i:'Overdose',t:'100 mcg/kg IV/IM (max 2 mg)',k:{v:[100,100],u:'mcg/kg',cap:2000}}],
+ mx:'Abrupt full reversal → severe pain, catecholamine surge, hypertension, pulmonary oedema, arrhythmias, acute withdrawal in dependent patients.',
+ on:'IV 1–2 min; IM 2–5 min',du:'30–90 min — shorter than many opioids: watch for renarcotisation',
+ ph:'Competitive antagonist at µ, κ, δ receptors (N-allyl derivative of oxymorphone). High first-pass metabolism (oral ineffective). Hepatic glucuronidation.',
+ ind:'Opioid-induced respiratory depression/sedation, opioid overdose, neuraxial opioid itch (low dose infusion).',
+ ci:'None in life-threatening overdose. Caution: opioid dependence, cardiovascular disease.',
+ nt:'',src:'BNF/BNFc; Resuscitation Council UK'},
+{id:'flumazenil',n:'Flumazenil',a:'Anexate',c:'Reversal / antagonist',
+ conc:'100 mcg/mL',cc:[{l:'100 mcg/mL',v:0.1}],
+ d:[{i:'Benzodiazepine reversal',t:'200 mcg IV over 15 s, then 100 mcg q60 s',k:{v:[0.2,0.2],u:'mg'}},
+    {i:'Max',t:'1 mg total (2 mg in ICU)',k:{v:[1,1],u:'mg',x:1}}],
+ p:[{i:'Reversal',t:'10 mcg/kg IV (max 200 mcg), repeat q60 s to max 50 mcg/kg or 1 mg',k:{v:[10,10],u:'mcg/kg',cap:200}}],
+ mx:'Max 1 mg (2 mg ICU). Seizures in benzodiazepine-dependent patients, epileptics on benzodiazepines, and mixed (TCA) overdoses.',
+ on:'1–2 min',du:'45–90 min (t½ ~1 h) — resedation likely with long-acting benzodiazepines',
+ ph:'Imidazobenzodiazepine; competitive antagonist at the benzodiazepine site of GABA-A. Hepatic metabolism.',
+ ind:'Reversal of benzodiazepine sedation (iatrogenic).',
+ ci:'Benzodiazepines used to control life-threatening conditions (status, ↑ICP); mixed overdose with proconvulsants (TCAs). Caution: dependence.',
+ nt:'',src:'SmPC; BNF'},
+
+/* ================= LOCAL ANAESTHETICS ================= */
+{id:'lidocaine',n:'Lidocaine (lignocaine)',a:'Xylocaine',c:'Local anaesthetic',
+ conc:'1% (10 mg/mL), 2% (20 mg/mL); with adrenaline 1:200,000; topical 4% solution, 10% spray (10 mg/spray)',cc:[{l:'1%',v:10},{l:'2%',v:20},{l:'4% topical',v:40}],
+ d:[{i:'Max dose — plain',t:'3 mg/kg (some references 4.5 mg/kg)',k:{v:[3,3],u:'mg/kg',s:'IBW',x:1}},
+    {i:'Max dose — with adrenaline',t:'7 mg/kg (max 500 mg)',k:{v:[7,7],u:'mg/kg',s:'IBW',cap:500,x:1}},
+    {i:'Max — topical airway (awake intubation)',t:'9 mg/kg LBW (DAS ATI 2020)',k:{v:[9,9],u:'mg/kg',s:'LBW',x:1}},
+    {i:'Antiarrhythmic / pressor attenuation',t:'1–1.5 mg/kg IV',k:{v:[1,1.5],u:'mg/kg',s:'IBW'}},
+    {i:'IV analgesic infusion',t:'≤1.5 mg/kg IBW bolus over 10 min, then ≤1.5 mg/kg/h IBW (Foo 2021 consensus); monitored setting',k:{v:[1,1.5],u:'mg/kg/h',s:'IBW',ic:20,icl:'2% neat'}},
+    {i:'Propofol injection pain',t:'20–40 mg IV with tourniquet/pre-mix'}],
+ p:[{i:'Max dose — plain',t:'3 mg/kg',k:{v:[3,3],u:'mg/kg',x:1}},
+    {i:'Max dose — with adrenaline',t:'7 mg/kg',k:{v:[7,7],u:'mg/kg',x:1}}],
+ mx:'LAST: perioral tingling, tinnitus, confusion → seizures → arrhythmia/CVS collapse (lidocaine: CNS precedes CVS, CC/CNS ratio ~7). Plasma >5 mcg/mL toxic. Max doses are guides, not absolute — site of injection matters (intercostal > caudal > epidural > brachial plexus > subcutaneous).',
+ on:'Infiltration immediate; nerve block 5–15 min',du:'Plain 1–2 h; with adrenaline 2–4 h',
+ ph:'Amide LA; blocks voltage-gated Na+ channels from inside (unionised form crosses membrane, ionised form binds). pKa 7.9, protein binding ~65%, intermediate lipid solubility. Hepatic CYP1A2/3A4 → MEGX (active). Class Ib antiarrhythmic. IV: analgesic, anti-hyperalgesic, anti-inflammatory, ↓ileus.',
+ ind:'Infiltration, nerve blocks, topical airway, IV regional (not first choice), IV analgesia, ventricular arrhythmias.',
+ ci:'Amide LA allergy (rare); complete heart block (unpaced); Adams-Stokes. Adrenaline-containing: IVRA.',
+ nt:'Treat LAST with lipid emulsion 20% — see Lipid emulsion entry.',
+ src:'ASRA LAST 2020; DAS ATI 2020; Foo et al. Anaesthesia 2021; SmPC'},
+{id:'bupivacaine',n:'Bupivacaine',a:'Marcaine; Marcaine Heavy (spinal)',c:'Local anaesthetic',
+ conc:'0.25% (2.5 mg/mL), 0.5% (5 mg/mL); 0.5% heavy (hyperbaric, with glucose 80 mg/mL) for spinal',cc:[{l:'0.25%',v:2.5},{l:'0.5%',v:5}],
+ d:[{i:'Max dose (single)',t:'2 mg/kg (max 150 mg); some references 2.5 mg/kg with adrenaline; 400 mg/24 h',k:{v:[2,2],u:'mg/kg',s:'IBW',cap:150,x:1}},
+    {i:'Spinal — Caesarean (0.5% heavy)',t:'10–12.5 mg (2–2.5 mL) + fentanyl 10–25 mcg ± morphine 100–150 mcg'},
+    {i:'Spinal — lower limb / TURP',t:'7.5–15 mg (1.5–3 mL 0.5% heavy); saddle 5–7.5 mg'},
+    {i:'Labour epidural',t:'Low-dose: 0.1% + fentanyl 2 mcg/mL (or 0.0625–0.125%); PIEB/PCEA per protocol'}],
+ p:[{i:'Max dose',t:'2 mg/kg (neonates/infants: lower — 1.5–2 mg/kg)',k:{v:[2,2],u:'mg/kg',x:1}},
+    {i:'Caudal (0.25%) — Armitage',t:'0.5 mL/kg sacral; 1 mL/kg lumbar/lower thoracic; 1.25 mL/kg mid-thoracic (watch max mg/kg)',k:{v:[0.5,1],u:'mL/kg'}},
+    {i:'Epidural infusion',t:'Max 0.4 mg/kg/h (children); 0.2 mg/kg/h (neonates)'}],
+ mx:'Most cardiotoxic LA: VT/VF, refractory arrest (R-enantiomer, "fast-in slow-out" Na+ channel binding). CC/CNS ratio ~3.7 — cardiac toxicity may occur with or before CNS signs. Treat with lipid emulsion early.',
+ on:'Spinal 5–10 min; nerve block 15–30 min',du:'Spinal 2–3 h; nerve block 4–12 h (up to 24 h)',
+ ph:'Amide LA (racemic). pKa 8.1 (slow onset), ~95% protein bound, highly lipid soluble (potent, long-acting). Sensory > motor at low concentrations. Hepatic CYP3A4.',
+ ind:'Spinal, epidural, peripheral nerve blocks, infiltration, caudal.',
+ ci:'IV regional anaesthesia (Bier\'s block) — absolute; hypersensitivity; 0.75% in obstetric epidural (historical cardiac arrests).',
+ nt:'',src:'ASRA LAST 2020; SmPC; OAA; APA'},
+{id:'levobupivacaine',n:'Levobupivacaine',a:'Chirocaine',c:'Local anaesthetic',
+ conc:'2.5, 5, 7.5 mg/mL (0.25%, 0.5%, 0.75%)',cc:[{l:'0.25%',v:2.5},{l:'0.5%',v:5},{l:'0.75%',v:7.5}],
+ d:[{i:'Max dose (single)',t:'2 mg/kg (max 150 mg); 400 mg/24 h',k:{v:[2,2],u:'mg/kg',s:'IBW',cap:150,x:1}},
+    {i:'Spinal (0.5% isobaric)',t:'10–15 mg'},
+    {i:'Nerve block',t:'0.25–0.5%, volume per block (stay within max)'}],
+ p:[{i:'Max dose',t:'2 mg/kg (lower in infants)',k:{v:[2,2],u:'mg/kg',x:1}},
+    {i:'Caudal (0.25%)',t:'0.5–1 mL/kg',k:{v:[0.5,1],u:'mL/kg'}}],
+ mx:'As bupivacaine but lower cardiotoxicity (S-enantiomer). LAST still possible — lipid emulsion.',
+ on:'10–15 min (block)',du:'Similar to bupivacaine: 4–12 h (block)',
+ ph:'Pure S(−)-enantiomer of bupivacaine. pKa 8.1, >97% protein bound. Less affinity for cardiac Na+ channels → higher toxic threshold than racemic bupivacaine; equipotent clinically.',
+ ind:'Spinal, epidural, peripheral nerve blocks, infiltration.',
+ ci:'IVRA; hypersensitivity; severe hypotension (epidural/spinal).',
+ nt:'',src:'SmPC; ASRA LAST 2020'},
+{id:'ropivacaine',n:'Ropivacaine',a:'Naropin',c:'Local anaesthetic',
+ conc:'2 mg/mL (0.2%), 7.5 mg/mL (0.75%), 10 mg/mL (1%)',cc:[{l:'0.2%',v:2},{l:'0.375% (diluted)',v:3.75},{l:'0.5% (diluted)',v:5},{l:'0.75%',v:7.5}],
+ d:[{i:'Max dose (single)',t:'3 mg/kg (commonly max ~225–300 mg); infusion up to ~770 mg/24 h',k:{v:[3,3],u:'mg/kg',s:'IBW',cap:300,x:1}},
+    {i:'Nerve block',t:'0.375–0.75%, volume per block'},
+    {i:'Perineural / epidural infusion',t:'0.2%, 6–14 mL/h (12–28 mg/h)'}],
+ p:[{i:'Max dose',t:'3 mg/kg (2.5–3)',k:{v:[3,3],u:'mg/kg',x:1}},
+    {i:'Caudal (0.2%)',t:'1 mL/kg',k:{v:[1,1],u:'mL/kg'}},
+    {i:'Epidural infusion',t:'0.2–0.4 mg/kg/h (≤0.2 mg/kg/h <6 months)'}],
+ mx:'LAST (less cardiotoxic than bupivacaine). Treat with lipid emulsion.',
+ on:'10–25 min (block)',du:'3–8 h (block; up to 12 h at 0.75%)',
+ ph:'Pure S-enantiomer amide with propyl (vs butyl) side chain — less lipid soluble, less cardiotoxic, slightly less potent than bupivacaine. More motor-sparing at low concentrations. Intrinsic vasoconstriction. pKa 8.1, 94% protein bound. CYP1A2.',
+ ind:'Peripheral nerve blocks, epidural (labour/post-op), infiltration, wound catheters.',
+ ci:'IVRA; hypersensitivity.',
+ nt:'',src:'SmPC (Naropin); ASRA LAST 2020'},
+{id:'prilocaine',n:'Prilocaine',a:'Citanest; Prilotekal (2% heavy spinal)',c:'Local anaesthetic',
+ conc:'0.5% (5 mg/mL) for IVRA; 2% hyperbaric spinal; 3% dental with felypressin',cc:[{l:'0.5%',v:5},{l:'2%',v:20}],
+ d:[{i:'Max dose',t:'6 mg/kg plain (8 mg/kg with felypressin/adrenaline); typically ≤400 mg',k:{v:[6,6],u:'mg/kg',s:'IBW',cap:400,x:1}},
+    {i:'IVRA (Bier\'s block)',t:'3 mg/kg of 0.5% (≈40 mL in 70 kg); cuff up ≥20 min',k:{v:[3,3],u:'mg/kg',s:'IBW'}},
+    {i:'Spinal (2% heavy)',t:'40–60 mg (2–3 mL), short procedures'}],
+ p:[{i:'Max dose',t:'6 mg/kg (avoid in infants <6 months — methaemoglobinaemia)',k:{v:[6,6],u:'mg/kg',x:1}}],
+ mx:'Methaemoglobinaemia (o-toluidine metabolite) at >~600 mg — treat with methylene blue 1–2 mg/kg. Least systemically toxic amide.',
+ on:'Fast',du:'1–2 h; spinal ~1.5–2 h',
+ ph:'Amide (toluidine derivative). pKa 7.9, 55% protein bound. Very high clearance (hepatic + extrahepatic) → lowest systemic toxicity, hence agent of choice for IVRA.',
+ ind:'IVRA, short-duration spinal (day case), dental.',
+ ci:'Methaemoglobinaemia, anaemia, G6PD deficiency (caution), neonates.',
+ nt:'',src:'SmPC; Oxford Handbook of Anaesthesia'},
+{id:'chloroprocaine',n:'Chloroprocaine (2-chloroprocaine)',a:'Ampres (1% spinal), Nesacaine',c:'Local anaesthetic',
+ conc:'1% (10 mg/mL) preservative-free spinal; 2–3% epidural (availability varies)',cc:[{l:'1%',v:10},{l:'3%',v:30}],
+ d:[{i:'Spinal (1%)',t:'30–50 mg (3–5 mL), ambulatory surgery <40–60 min'},
+    {i:'Max dose',t:'11 mg/kg plain (max 800 mg); 14 mg/kg with adrenaline (max 1 g)',k:{v:[11,11],u:'mg/kg',s:'IBW',cap:800,x:1}},
+    {i:'Epidural top-up (3%)',t:'15–20 mL for emergency CS (US practice)'}],
+ p:[{i:'—',t:'Specialist use'}],
+ mx:'Very low systemic toxicity (rapid hydrolysis). Historical neurotoxicity with bisulfite/EDTA preservatives — use preservative-free only for neuraxial.',
+ on:'Spinal 5–10 min; epidural rapid',du:'Spinal 40–90 min',
+ ph:'Ester LA; hydrolysed by plasma cholinesterase (plasma t½ ~20–40 s) → minimal systemic accumulation. pKa 8.7 but high concentrations give fast onset. Prolonged in cholinesterase deficiency.',
+ ind:'Short-duration spinal (day surgery), rapid epidural extension.',
+ ci:'Ester/PABA allergy; atypical plasma cholinesterase (relative).',
+ nt:'Availability varies by country — check local formulary.',
+ src:'SmPC (Ampres)'},
+
+/* ================= VASOPRESSORS / INOTROPES ================= */
+{id:'phenylephrine',n:'Phenylephrine',a:'',c:'Vasopressor / inotrope',
+ conc:'10 mg/mL ampoule — dilute (e.g., 10 mg in 100 mL = 100 mcg/mL); prefilled 50/100 mcg/mL',cc:[{l:'100 mcg/mL',v:0.1},{l:'50 mcg/mL',v:0.05}],
+ d:[{i:'Bolus',t:'50–100 mcg IV',k:{v:[50,100],u:'mcg'}},
+    {i:'Infusion',t:'0.1–1 mcg/kg/min, titrate',k:{v:[0.1,1],u:'mcg/kg/min',s:'TBW',ic:100,icl:'100 mcg/mL'}},
+    {i:'Spinal hypotension (obstetric)',t:'Prophylactic infusion 25–50 mcg/min from spinal, titrate to baseline BP; bolus 50–100 mcg (Kinsella 2018 consensus)',k:{v:[25,50],u:'mcg/min',ic:100,icl:'100 mcg/mL'}}],
+ p:[{i:'Bolus',t:'1–2 mcg/kg IV',k:{v:[1,2],u:'mcg/kg'}}],
+ mx:'Reflex bradycardia, ↓cardiac output, hypertension; extravasation.',
+ on:'<1 min',du:'5–10 min (bolus)',
+ ph:'Direct-acting synthetic α1 agonist (weak β). ↑SVR and BP; reflex baroreceptor bradycardia; may ↓CO. Metabolised by MAO. Preferred obstetric vasopressor (less fetal acidosis than ephedrine).',
+ ind:'Hypotension due to vasodilation (spinal, GA), especially with tachycardia; obstetric spinal hypotension.',
+ ci:'Severe hypertension, severe bradycardia; caution in low cardiac output, MAOIs.',
+ nt:'Check dilution — ampoule is 10 mg/mL (100× bolus dose).',
+ src:'Kinsella et al. Anaesthesia 2018; SmPC'},
+{id:'ephedrine',n:'Ephedrine',a:'',c:'Vasopressor / inotrope',
+ conc:'30 mg/mL ampoule (dilute 30 mg to 10 mL = 3 mg/mL); prefilled 3 mg/mL',cc:[{l:'3 mg/mL',v:3},{l:'30 mg/mL',v:30}],
+ d:[{i:'Bolus',t:'3–6 mg IV (up to 9 mg), repeat; tachyphylaxis beyond ~30 mg',k:{v:[3,6],u:'mg'}}],
+ p:[{i:'Bolus',t:'0.1–0.2 mg/kg IV',k:{v:[0.1,0.2],u:'mg/kg'}}],
+ mx:'Tachyphylaxis (noradrenaline depletion). Tachycardia, hypertension, arrhythmia. Crosses placenta → fetal acidosis at higher doses.',
+ on:'1–2 min',du:'10–20 min',
+ ph:'Mixed-acting sympathomimetic: direct α/β agonist + indirect (noradrenaline release). ↑HR, ↑contractility, ↑BP. Not metabolised by MAO/COMT; renal excretion largely unchanged.',
+ ind:'Hypotension with bradycardia or normal HR (spinal, GA).',
+ ci:'MAOIs (hypertensive crisis); caution IHD, tachyarrhythmia, hyperthyroidism, closed-angle glaucoma.',
+ nt:'',src:'SmPC; Oxford Handbook of Anaesthesia'},
+{id:'metaraminol',n:'Metaraminol',a:'Aramine',c:'Vasopressor / inotrope',
+ conc:'10 mg/mL ampoule — dilute (e.g., 10 mg in 20 mL = 0.5 mg/mL)',cc:[{l:'0.5 mg/mL',v:0.5}],
+ d:[{i:'Bolus',t:'0.5–1 mg IV',k:{v:[0.5,1],u:'mg'}},
+    {i:'Infusion',t:'1–10 mg/h (local protocols vary)'}],
+ p:[{i:'Bolus',t:'10 mcg/kg IV (specialist use)',k:{v:[10,10],u:'mcg/kg'}}],
+ mx:'Reflex bradycardia, hypertension, tachyphylaxis.',
+ on:'1–2 min',du:'20–60 min',
+ ph:'Mainly direct α1 agonist with some β1 and indirect action (displaces noradrenaline; false transmitter).',
+ ind:'Hypotension under GA/regional.',
+ ci:'MAOIs; caution in severe IHD, hypertension.',
+ nt:'Not available in all countries.',src:'SmPC'},
+{id:'noradrenaline',n:'Noradrenaline (norepinephrine)',a:'Levophed',c:'Vasopressor / inotrope',
+ conc:'1 mg/mL ampoule; common: 4 mg in 50 mL (80 mcg/mL) central — dilution varies',cc:[{l:'80 mcg/mL',v:0.08},{l:'16 mcg/mL',v:0.016}],
+ d:[{i:'Infusion',t:'0.01–0.5 mcg/kg/min (higher in refractory shock)',k:{v:[0.01,0.5],u:'mcg/kg/min',s:'TBW',ic:80,icl:'4 mg/50 mL'}},
+    {i:'Bolus (theatre, off-label)',t:'4–10 mcg IV (dilute, e.g., 10 mcg/mL)'}],
+ p:[{i:'Infusion',t:'0.05–0.5 mcg/kg/min (up to 1+)',k:{v:[0.05,0.5],u:'mcg/kg/min',ic:80,icl:'4 mg/50 mL'}}],
+ mx:'Hypertension, reflex bradycardia, arrhythmia, tissue/splanchnic ischaemia. Extravasation → necrosis (phentolamine 5–10 mg in 10 mL saline infiltrated).',
+ on:'1–2 min',du:'1–2 min after stopping',
+ ph:'Endogenous catecholamine; α1 >> β1 agonist (minimal β2). ↑SVR, ↑MAP, reflex bradycardia; CO unchanged or ↓. Metabolised by COMT/MAO (uptake 1 & 2).',
+ ind:'Vasodilatory shock (sepsis first-line), vasoplegia, intraoperative hypotension.',
+ ci:'Hypovolaemia (correct first — relative); mesenteric/peripheral vascular thrombosis.',
+ nt:'Short-term peripheral infusion of dilute solution via a large, well-sited cannula is acceptable with site checks. Avoid flushing infusion line.',
+ src:'SSC 2021; SmPC'},
+{id:'adrenaline',n:'Adrenaline (epinephrine)',a:'',c:'Vasopressor / inotrope',
+ conc:'1 mg/mL (1:1000); 100 mcg/mL (1:10,000); 10 mcg/mL (push-dose, diluted)',cc:[{l:'1:1000 (1 mg/mL)',v:1},{l:'1:10,000 (100 mcg/mL)',v:0.1},{l:'10 mcg/mL',v:0.01}],
+ d:[{i:'Cardiac arrest',t:'1 mg IV/IO q3–5 min (non-shockable: ASAP; shockable: after 3rd shock)',k:{v:[1,1],u:'mg'}},
+    {i:'Periop anaphylaxis — IV bolus',t:'50 mcg IV (RCUK 2024), titrate/repeat; ANZCA graded: 10–20 mcg moderate, 100–200 mcg life-threatening',k:{v:[50,50],u:'mcg'}},
+    {i:'Anaphylaxis — IM (no IV)',t:'500 mcg IM (0.5 mL 1:1000) anterolateral thigh, repeat q5 min',k:{v:[0.5,0.5],u:'mg'}},
+    {i:'Anaphylaxis — peripheral infusion',t:'0.5 mg in 50 mL (10 mcg/mL) at 0.5–1 mL/kg/h (RCUK)',k:{v:[0.083,0.167],u:'mcg/kg/min',s:'TBW',ic:10,icl:'0.5 mg/50 mL'}},
+    {i:'Inotrope infusion',t:'0.01–0.5 mcg/kg/min (dilution varies)',k:{v:[0.01,0.5],u:'mcg/kg/min',s:'TBW',ic:80,icl:'4 mg/50 mL'}},
+    {i:'LAST arrest',t:'Small doses <1 mcg/kg (ASRA 2020)',k:{v:[1,1],u:'mcg/kg',s:'IBW',x:1}}],
+ p:[{i:'Cardiac arrest',t:'10 mcg/kg IV/IO (0.1 mL/kg of 1:10,000), max 1 mg',k:{v:[10,10],u:'mcg/kg',cap:1000}},
+    {i:'Periop anaphylaxis — IV',t:'1 mcg/kg IV (dilute carefully), titrate',k:{v:[1,1],u:'mcg/kg'}},
+    {i:'Anaphylaxis — IM',t:'10 mcg/kg IM (max 500 mcg); or age: <6 y 150 mcg, 6–12 y 300 mcg, >12 y 500 mcg',k:{v:[10,10],u:'mcg/kg',cap:500}},
+    {i:'Croup (nebulised)',t:'0.5 mL/kg of 1:1000 (max 5 mL)',k:{v:[0.5,0.5],u:'mL/kg',cap:5}}],
+ mx:'Arrhythmias (VT/VF), severe hypertension, myocardial ischaemia, pulmonary oedema — especially with undiluted IV 1:1000 given in error. Hyperglycaemia, hypokalaemia, lactic acidosis.',
+ on:'IV immediate; IM 3–5 min',du:'IV 2–5 min',
+ ph:'Endogenous catecholamine; β1/β2 effects predominate at low dose, α1 at higher dose. ↑HR, contractility, CO; bronchodilation; mast-cell stabilisation; vasoconstriction (high dose). Metabolised by COMT/MAO.',
+ ind:'Cardiac arrest, anaphylaxis, low cardiac output, bronchospasm, croup, adjunct to LA.',
+ ci:'None in arrest/anaphylaxis. Caution: IHD, tachyarrhythmias, hyperthyroidism, cocaine toxicity.',
+ nt:'Always confirm concentration — 1:1000 vs 1:10,000 confusion is a recurrent fatal error.',
+ src:'RCUK ALS/PLS 2021; RCUK periop anaphylaxis algorithm 2024; ANZCA/ANZAAG 2022; ASRA LAST 2020'},
+{id:'vasopressin',n:'Vasopressin',a:'Pitressin, argipressin',c:'Vasopressor / inotrope',
+ conc:'20 units/mL; common: 20 units in 50 mL (0.4 units/mL)',cc:[{l:'20 units/mL',v:20,u:'units'},{l:'0.4 units/mL',v:0.4,u:'units'}],
+ d:[{i:'Septic shock (add to noradrenaline)',t:'0.01–0.03 units/min (up to 0.04)',k:{v:[0.01,0.03],u:'units/min',ic:0.4,icl:'20 units/50 mL'}},
+    {i:'Refractory vasoplegia (theatre bolus)',t:'0.5–1 unit IV (off-label)'}],
+ p:[{i:'—',t:'Specialist use (0.0003–0.002 units/kg/min)'}],
+ mx:'Coronary, mesenteric and digital ischaemia; hyponatraemia; skin necrosis. Avoid in LAST.',
+ on:'Minutes',du:'t½ 10–20 min',
+ ph:'Endogenous nonapeptide (ADH). V1 (Gq → IP3/Ca2+): vasoconstriction; V2: aquaporin-2 insertion (antidiuresis); V3: ACTH release. Non-adrenergic — effective in acidosis and catecholamine resistance; relative vasopressin deficiency in septic shock.',
+ ind:'Catecholamine-resistant vasodilatory shock, post-CPB vasoplegia, ACEi/ARB-related refractory hypotension.',
+ ci:'Caution IHD, peripheral vascular disease. Avoid in LAST.',
+ nt:'',src:'SSC 2021; SmPC'},
+{id:'dobutamine',n:'Dobutamine',a:'Dobutrex',c:'Vasopressor / inotrope',
+ conc:'12.5 mg/mL (250 mg/20 mL); common 250 mg in 50 mL (5 mg/mL)',cc:[{l:'5 mg/mL',v:5}],
+ d:[{i:'Infusion',t:'2.5–10 mcg/kg/min (up to 20)',k:{v:[2.5,10],u:'mcg/kg/min',s:'TBW',ic:5000,icl:'250 mg/50 mL'}}],
+ p:[{i:'Infusion',t:'5–20 mcg/kg/min',k:{v:[5,20],u:'mcg/kg/min',ic:5000,icl:'250 mg/50 mL'}}],
+ mx:'Tachyarrhythmias, hypotension (β2 vasodilation), myocardial ischaemia.',
+ on:'1–2 min',du:'<10 min after stopping (t½ ~2 min)',
+ ph:'Synthetic catecholamine (racemic): (+) β1/β2 agonist, (−) α1 agonist; net β1 >> β2 > α1. Inodilator: ↑contractility, ↑HR, ↓SVR/PCWP. COMT metabolism.',
+ ind:'Low cardiac output states, cardiogenic shock (with vasopressor), stress echocardiography.',
+ ci:'LVOT obstruction (HOCM), severe AS (relative), uncontrolled tachyarrhythmia; correct hypovolaemia first.',
+ nt:'',src:'SmPC'},
+{id:'milrinone',n:'Milrinone',a:'Primacor',c:'Vasopressor / inotrope',
+ conc:'1 mg/mL; common 10 mg in 50 mL (200 mcg/mL)',cc:[{l:'200 mcg/mL',v:0.2}],
+ d:[{i:'Loading (optional)',t:'50 mcg/kg over 10 min (often omitted — hypotension)',k:{v:[50,50],u:'mcg/kg',s:'TBW'}},
+    {i:'Infusion',t:'0.375–0.75 mcg/kg/min (reduce in renal impairment)',k:{v:[0.375,0.75],u:'mcg/kg/min',s:'TBW',ic:200,icl:'10 mg/50 mL'}}],
+ p:[{i:'Infusion',t:'0.25–0.75 mcg/kg/min (load 50–75 mcg/kg)',k:{v:[0.25,0.75],u:'mcg/kg/min',ic:200,icl:'10 mg/50 mL'}}],
+ mx:'Hypotension (vasodilation), arrhythmias, thrombocytopenia. Accumulates in renal failure.',
+ on:'5–15 min',du:'t½ 2–3 h (longer in renal impairment)',
+ ph:'PDE3 inhibitor → ↑cAMP in myocardium and vascular smooth muscle. Inodilator with lusitropy; ↓PVR and SVR. Acts independent of β-receptors (useful with β-blockade/receptor down-regulation). Renal excretion mostly unchanged.',
+ ind:'Low cardiac output (post-cardiac surgery), RV failure/pulmonary hypertension, decompensated HF.',
+ ci:'Severe obstructive valve disease, HOCM; hypotension. Dose-reduce in renal impairment.',
+ nt:'',src:'SmPC'},
+
+/* ================= ANTIHYPERTENSIVES / ANTIARRHYTHMICS ================= */
+{id:'labetalol',n:'Labetalol',a:'Trandate',c:'Antihypertensive / antiarrhythmic',
+ conc:'5 mg/mL',cc:[{l:'5 mg/mL',v:5}],
+ d:[{i:'Intraop bolus',t:'5–10 mg IV q5 min, titrate'},
+    {i:'Severe HTN in pregnancy',t:'20 mg IV, then 40, 80, 80 mg q10 min (max 300 mg); or infusion 20 mg/h doubling q30 min (max 160 mg/h)'},
+    {i:'Max cumulative bolus',t:'300 mg',k:{v:[300,300],u:'mg',x:1}}],
+ p:[{i:'Bolus',t:'0.25–0.5 mg/kg IV (max 20 mg)',k:{v:[0.25,0.5],u:'mg/kg',cap:20}}],
+ mx:'Bradycardia, heart block, bronchospasm, postural hypotension. Neonatal bradycardia/hypoglycaemia if given before delivery.',
+ on:'2–5 min',du:'2–6 h',
+ ph:'Competitive α1 + non-selective β antagonist (β:α ~7:1 IV, 3:1 oral). ↓SVR without reflex tachycardia. Hepatic glucuronidation.',
+ ind:'Perioperative hypertension, severe hypertension in pregnancy, aortic dissection (with other agents).',
+ ci:'Asthma/bronchospasm, 2nd/3rd-degree heart block, cardiogenic shock, severe bradycardia, decompensated HF.',
+ nt:'',src:'NICE NG133; ACOG; SmPC'},
+{id:'esmolol',n:'Esmolol',a:'Brevibloc',c:'Antihypertensive / antiarrhythmic',
+ conc:'10 mg/mL (100 mg/10 mL); premixed 2.5 g/250 mL',cc:[{l:'10 mg/mL',v:10}],
+ d:[{i:'Bolus',t:'0.5 mg/kg over 1 min (0.25–1 mg/kg); 10–20 mg increments for intubation response',k:{v:[0.5,1],u:'mg/kg',s:'TBW'}},
+    {i:'Infusion',t:'50–300 mcg/kg/min',k:{v:[50,300],u:'mcg/kg/min',s:'TBW',ic:10000,icl:'10 mg/mL'}}],
+ p:[{i:'Bolus',t:'0.1–0.5 mg/kg IV',k:{v:[0.1,0.5],u:'mg/kg'}}],
+ mx:'Bradycardia, hypotension, heart block. Rapid offset limits harm.',
+ on:'1–2 min',du:'10–20 min (t½ ~9 min)',
+ ph:'Cardioselective β1 antagonist; hydrolysed by red-cell esterases (not plasma cholinesterase) → short duration. Metabolite (acid) renally excreted.',
+ ind:'Attenuating intubation/extubation response, perioperative tachyarrhythmia (AF/SVT rate control), short-term hypertension.',
+ ci:'Severe bradycardia, >1st-degree heart block, cardiogenic shock, decompensated HF. Caution: asthma (β1-selective but not absolute).',
+ nt:'',src:'SmPC'},
+{id:'metoprolol',n:'Metoprolol',a:'Betaloc, Lopressor',c:'Antihypertensive / antiarrhythmic',
+ conc:'1 mg/mL (5 mg/5 mL)',cc:[{l:'1 mg/mL',v:1}],
+ d:[{i:'Rate control / HTN',t:'1–2.5 mg IV over 1–2 min, repeat q5 min to max 15 mg (AF rate: 2.5–5 mg up to 3 doses)',k:{v:[15,15],u:'mg',x:1}}],
+ p:[{i:'—',t:'Specialist use'}],
+ mx:'Max 15 mg IV (acute). Bradycardia, hypotension, bronchospasm, heart failure.',
+ on:'2–5 min',du:'3–6 h',
+ ph:'Cardioselective β1 antagonist, moderately lipophilic. CYP2D6 metabolism (polymorphic).',
+ ind:'Perioperative tachycardia/AF rate control, hypertension, MH-related arrhythmias.',
+ ci:'Bradycardia, heart block, cardiogenic shock, decompensated HF, severe asthma.',
+ nt:'',src:'SmPC; AAGBI MH 2020'},
+{id:'hydralazine',n:'Hydralazine',a:'Apresoline',c:'Antihypertensive / antiarrhythmic',
+ conc:'20 mg powder (reconstitute 1 mL, dilute to 10–20 mL)',cc:[{l:'1 mg/mL (20 mg/20 mL)',v:1}],
+ d:[{i:'Severe HTN (incl. pregnancy)',t:'5–10 mg slow IV, repeat q20 min (max 20 mg cumulative bolus); infusion 50–300 mcg/min'}],
+ p:[{i:'Bolus',t:'0.1–0.2 mg/kg slow IV (max 20 mg)',k:{v:[0.1,0.2],u:'mg/kg',cap:20}}],
+ mx:'Reflex tachycardia, headache, precipitous hypotension (esp. pre-eclampsia — consider fluid co-load). Lupus-like syndrome (chronic, slow acetylators).',
+ on:'10–20 min',du:'2–6 h',
+ ph:'Direct arteriolar vasodilator (↓intracellular Ca2+ release, ↑cGMP). Reflex tachycardia and fluid retention. Hepatic acetylation (fast/slow acetylators).',
+ ind:'Severe hypertension in pregnancy, perioperative hypertension.',
+ ci:'SLE, severe tachycardia, high-output HF, dissecting aneurysm (without β-blockade), acute porphyria.',
+ nt:'',src:'NICE NG133; SmPC'},
+{id:'gtn',n:'Glyceryl trinitrate (GTN)',a:'Nitroglycerin',c:'Antihypertensive / antiarrhythmic',
+ conc:'1 mg/mL (50 mg/50 mL) or 5 mg/mL; SL spray 400 mcg/dose',cc:[{l:'1 mg/mL',v:1},{l:'100 mcg/mL (diluted)',v:0.1}],
+ d:[{i:'Infusion',t:'10–200 mcg/min (start 5–10 mcg/min, titrate)',k:{v:[10,200],u:'mcg/min',ic:1000,icl:'50 mg/50 mL'}},
+    {i:'Uterine relaxation',t:'50–100 mcg IV bolus (dilute to 100 mcg/mL), or 400–800 mcg SL'},
+    {i:'Angina',t:'400–800 mcg SL'}],
+ p:[{i:'Infusion',t:'0.5–5 mcg/kg/min (specialist)',k:{v:[0.5,5],u:'mcg/kg/min',ic:1000,icl:'1 mg/mL'}}],
+ mx:'Hypotension, reflex tachycardia, headache, tachyphylaxis; methaemoglobinaemia at high doses.',
+ on:'IV 1–2 min; SL 1–3 min',du:'IV 3–5 min after stopping; SL 20–30 min',
+ ph:'Organic nitrate → NO → guanylate cyclase → ↑cGMP → smooth muscle relaxation. Venodilation predominant at low dose (↓preload), arteriolar at higher doses; coronary vasodilation. Uterine relaxant.',
+ ind:'Hypertension (esp. with pulmonary oedema/IHD), angina/myocardial ischaemia, controlled hypotension, uterine relaxation (retained placenta, inversion, ECV), oesophageal spasm.',
+ ci:'PDE5 inhibitor use (sildenafil within 24 h, tadalafil within 48 h); severe AS, HOCM, hypovolaemia, cardiac tamponade, constrictive pericarditis, raised ICP (relative).',
+ nt:'Absorbed by PVC — use non-PVC giving sets.',src:'SmPC; BNF'},
+{id:'amiodarone',n:'Amiodarone',a:'Cordarone',c:'Antihypertensive / antiarrhythmic',
+ conc:'50 mg/mL (150 mg/3 mL); prefilled 300 mg/10 mL',cc:[{l:'50 mg/mL',v:50},{l:'30 mg/mL (prefilled)',v:30}],
+ d:[{i:'Cardiac arrest (VF/pVT)',t:'300 mg IV after 3rd shock; further 150 mg after 5th shock',k:{v:[300,300],u:'mg'}},
+    {i:'Stable tachyarrhythmia',t:'300 mg (5 mg/kg) IV over 20–60 min, then 900 mg over 24 h',k:{v:[5,5],u:'mg/kg',s:'TBW',cap:300}}],
+ p:[{i:'Cardiac arrest',t:'5 mg/kg IV/IO (max 300 mg) after 3rd and 5th shocks',k:{v:[5,5],u:'mg/kg',cap:300}}],
+ mx:'Acute: hypotension (solvent), bradycardia, heart block, QT prolongation/torsades, phlebitis (use central line or large vein). Chronic: thyroid (hypo/hyper), pulmonary fibrosis, hepatotoxicity, corneal deposits, photosensitivity, peripheral neuropathy.',
+ on:'IV: minutes (variable)',du:'Very long elimination t½ (25–100 days with chronic use)',
+ ph:'Class III antiarrhythmic (K+ channel block → prolonged repolarisation) with class I, II and IV actions. Iodinated benzofuran; large Vd; hepatic CYP3A4 → desethylamiodarone (active). Inhibits CYP3A4/2C9/P-gp (warfarin, digoxin, statins interactions).',
+ ind:'VF/pVT arrest, AF/flutter, SVT, VT.',
+ ci:'(Non-arrest) sinus bradycardia, SA/AV block without pacing, thyroid dysfunction, iodine sensitivity, QT-prolonging drugs.',
+ nt:'Dilute in 5% glucose only.',src:'RCUK ALS/PLS 2021; SmPC'},
+{id:'adenosine',n:'Adenosine',a:'Adenocor',c:'Antihypertensive / antiarrhythmic',
+ conc:'3 mg/mL',cc:[{l:'3 mg/mL',v:3}],
+ d:[{i:'SVT (RCUK 2021)',t:'6 mg rapid IV push + flush → 12 mg → 18 mg (start 3 mg via central line, heart transplant, or on dipyridamole/carbamazepine)',k:{v:[6,6],u:'mg'}}],
+ p:[{i:'SVT',t:'100–150 mcg/kg rapid IV (max 6 mg); increase to 300 mcg/kg (max 12 mg) — follow local PLS/APLS chart',k:{v:[100,150],u:'mcg/kg',cap:6000}}],
+ mx:'Transient asystole, flushing, chest discomfort, dyspnoea, bronchospasm; AF degeneration to VF with pre-excitation.',
+ on:'<10–20 s',du:'10–20 s (t½ <10 s)',
+ ph:'Purine nucleoside; A1 receptor agonist at AV node → ↑K+ conductance, transient AV block. A2 receptor vasodilation. Rapid uptake into RBCs/endothelium and deamination.',
+ ind:'Termination of re-entrant SVT involving AV node; diagnostic unmasking of atrial flutter.',
+ ci:'Asthma (relative — bronchospasm), 2nd/3rd-degree AV block, sick sinus (unpaced), long QT, pre-excited AF/WPW with AF. Interactions: dipyridamole ↑ effect (reduce dose), theophylline/caffeine ↓ effect.',
+ nt:'Warn patient of transient chest discomfort. Record rhythm strip.',src:'RCUK ALS/PLS 2021'},
+{id:'magnesium',n:'Magnesium sulphate',a:'',c:'Antihypertensive / antiarrhythmic',
+ conc:'50% (500 mg/mL ≈ 2 mmol/mL); 10% and 20% solutions',cc:[{l:'50%',v:500},{l:'20%',v:200},{l:'10%',v:100}],
+ d:[{i:'Pre-eclampsia / eclampsia',t:'4 g IV over 5–15 min, then 1 g/h for 24 h; recurrent seizure 2–4 g over 5 min'},
+    {i:'Torsades / arrhythmia',t:'2 g (8 mmol) IV over 10 min',k:{v:[2000,2000],u:'mg'}},
+    {i:'Acute severe asthma',t:'1.2–2 g IV over 20 min'},
+    {i:'Analgesic adjunct',t:'30–50 mg/kg IV bolus ± 10 mg/kg/h',k:{v:[30,50],u:'mg/kg',s:'IBW'}}],
+ p:[{i:'Asthma',t:'40 mg/kg IV over 20 min (max 2 g)',k:{v:[40,40],u:'mg/kg',cap:2000}},
+    {i:'Torsades',t:'25–50 mg/kg IV (max 2 g)',k:{v:[25,50],u:'mg/kg',cap:2000}}],
+ mx:'Therapeutic (pre-eclampsia) 2–4 mmol/L; loss of patellar reflexes >5 mmol/L; respiratory depression ~6–7.5 mmol/L; cardiac arrest >12 mmol/L. Antidote: calcium gluconate 10% 10–20 mL IV. Monitor reflexes, RR, urine output; reduce in renal impairment.',
+ on:'Immediate (IV)',du:'~30 min (bolus effect)',
+ ph:'Physiological Ca2+ antagonist (L-type channels, ↓ACh release at NMJ), NMDA antagonist. Vasodilator, bronchodilator, tocolytic, anticonvulsant (eclampsia), antiarrhythmic. Potentiates both depolarising and non-depolarising NMBAs. Renally excreted.',
+ ind:'Eclampsia prevention/treatment, torsades, hypomagnesaemia, severe asthma, analgesic adjunct, phaeochromocytoma surgery, fetal neuroprotection.',
+ ci:'Myasthenia gravis, heart block; caution renal impairment, with calcium channel blockers.',
+ nt:'1 g MgSO4 ≈ 4 mmol Mg2+.',src:'Magpie/Collaborative Eclampsia Trial; NICE NG133; RCUK ALS; BTS asthma'},
+
+/* ================= ANTIEMETICS ================= */
+{id:'ondansetron',n:'Ondansetron',a:'Zofran',c:'Antiemetic',
+ conc:'2 mg/mL',cc:[{l:'2 mg/mL',v:2}],
+ d:[{i:'PONV prophylaxis / treatment',t:'4 mg IV at end of surgery (8 mg PO/ODT)',k:{v:[4,4],u:'mg'}}],
+ p:[{i:'PONV (>1 month)',t:'0.1 mg/kg IV (max 4 mg)',k:{v:[0.1,0.1],u:'mg/kg',cap:4}}],
+ mx:'QT prolongation (dose-dependent; single IV dose max 16 mg). Headache, constipation. Serotonin syndrome with serotonergic drugs (rare).',
+ on:'IV ~5–10 min (full effect <30 min)',du:'4–8 h (t½ 3–4 h)',
+ ph:'Selective 5-HT3 antagonist at CTZ (area postrema) and vagal afferents in gut. Hepatic CYP3A4/1A2/2D6.',
+ ind:'PONV prophylaxis and treatment, CINV, neuraxial opioid itch (modest).',
+ ci:'Congenital long QT; concomitant apomorphine. Caution: QT-prolonging drugs, hypoK/hypoMg. Small signal for orofacial cleft in 1st trimester.',
+ nt:'',src:'Gan et al. 4th PONV consensus 2020; SmPC'},
+{id:'granisetron',n:'Granisetron',a:'Kytril',c:'Antiemetic',
+ conc:'1 mg/mL',cc:[{l:'1 mg/mL',v:1}],
+ d:[{i:'PONV',t:'1 mg IV (0.35–3 mg) at end of surgery',k:{v:[1,1],u:'mg'}}],
+ p:[{i:'PONV/CINV',t:'20–40 mcg/kg IV (max 1 mg)',k:{v:[20,40],u:'mcg/kg',cap:1000}}],
+ mx:'QT prolongation (less than ondansetron), headache, constipation.',
+ on:'~5 min',du:'Up to 24 h',
+ ph:'Selective 5-HT3 antagonist with longer duration than ondansetron. Hepatic CYP3A4.',
+ ind:'PONV prophylaxis/treatment, CINV.',
+ ci:'Hypersensitivity; caution long QT.',
+ nt:'',src:'Gan et al. 4th PONV consensus 2020'},
+{id:'dexamethasone',n:'Dexamethasone',a:'Decadron',c:'Antiemetic',
+ conc:'4 mg/mL (dexamethasone phosphate); some formulations 3.3 mg/mL base',cc:[{l:'4 mg/mL',v:4},{l:'3.3 mg/mL',v:3.3}],
+ d:[{i:'PONV prophylaxis',t:'4–8 mg IV at induction',k:{v:[4,8],u:'mg'}},
+    {i:'Airway oedema',t:'8 mg IV q8h (0.1–0.2 mg/kg)'},
+    {i:'Block prolongation',t:'4–8 mg IV (perineural use off-label)'},
+    {i:'Cerebral oedema',t:'10 mg IV then 4 mg q6h'}],
+ p:[{i:'PONV',t:'0.15 mg/kg IV (max 5 mg; some use max 8 mg)',k:{v:[0.15,0.15],u:'mg/kg',cap:5}},
+    {i:'Croup',t:'0.15 mg/kg PO/IV (up to 0.6 mg/kg severe)',k:{v:[0.15,0.6],u:'mg/kg',cap:12}},
+    {i:'Post-tonsillectomy',t:'0.15 mg/kg IV (max 8 mg)',k:{v:[0.15,0.15],u:'mg/kg',cap:8}}],
+ mx:'Hyperglycaemia (rise 24 h post-dose), perineal burning/itch with rapid IV push in awake patients. Tumour lysis in undiagnosed lymphoma/leukaemia. Single 8 mg dose not associated with increased surgical-site infection (PADDI 2021).',
+ on:'Antiemetic effect slow (give at induction)',du:'Biological 36–72 h',
+ ph:'Synthetic glucocorticoid (~25× hydrocortisone potency, negligible mineralocorticoid). Antiemetic mechanism uncertain (central prostaglandin antagonism, ↓5-HT release). Anti-inflammatory, reduces post-op pain and fatigue.',
+ ind:'PONV, airway oedema, cerebral oedema, croup, block adjunct, adrenal replacement (with mineralocorticoid).',
+ ci:'Systemic fungal infection; live vaccines. Caution: diabetes, undiagnosed haematological malignancy, active infection.',
+ nt:'',src:'Gan et al. 4th PONV consensus 2020; PADDI (NEJM 2021)'},
+{id:'metoclopramide',n:'Metoclopramide',a:'Maxolon, Maxeran',c:'Antiemetic',
+ conc:'5 mg/mL',cc:[{l:'5 mg/mL',v:5}],
+ d:[{i:'Antiemetic / prokinetic',t:'10 mg IV/IM/PO up to TDS (max 30 mg/day or 0.5 mg/kg/day; max 5 days)',k:{v:[10,10],u:'mg'}}],
+ p:[{i:'Antiemetic (>1 y, second line)',t:'0.1–0.15 mg/kg (max 10 mg) up to TDS',k:{v:[0.1,0.15],u:'mg/kg',cap:10}}],
+ mx:'Max 30 mg/day (0.5 mg/kg/day). Acute dystonia/oculogyric crisis (young women, children — treat with procyclidine/benztropine), akathisia, NMS, tardive dyskinesia (prolonged).',
+ on:'IV 1–3 min; PO 30–60 min',du:'1–2 h',
+ ph:'D2 antagonist (CTZ), 5-HT4 agonist (prokinetic — ↑LOS tone, gastric emptying), weak 5-HT3 antagonist at high doses. 10 mg has limited PONV efficacy.',
+ ind:'Nausea/vomiting, gastric emptying before RSI, gastroparesis.',
+ ci:'GI obstruction, perforation or haemorrhage; within 3–4 days of GI surgery; phaeochromocytoma; Parkinson\'s disease; epilepsy (relative); <1 y.',
+ nt:'',src:'EMA 2013 restrictions; BNF'},
+{id:'droperidol',n:'Droperidol',a:'Xomolix, Inapsine',c:'Antiemetic',
+ conc:'2.5 mg/mL',cc:[{l:'2.5 mg/mL',v:2.5}],
+ d:[{i:'PONV',t:'0.625–1.25 mg IV (at end of surgery or with PCA morphine)',k:{v:[0.625,1.25],u:'mg'}}],
+ p:[{i:'PONV (>2 y)',t:'10–50 mcg/kg IV (max 1.25 mg)',k:{v:[10,50],u:'mcg/kg',cap:1250}}],
+ mx:'QT prolongation/torsades (FDA boxed warning; contested at antiemetic doses), sedation, dysphoria, extrapyramidal effects, NMS.',
+ on:'3–10 min',du:'2–4 h (antiemetic up to 12 h)',
+ ph:'Butyrophenone; D2 antagonist at CTZ. α1 blockade (mild hypotension). Hepatic metabolism.',
+ ind:'PONV prophylaxis/treatment, agitation (ED/ICU).',
+ ci:'Prolonged QTc (>440 ms M / >450 ms F), hypoK/hypoMg, bradycardia <55, Parkinson\'s disease, phaeochromocytoma, comatose states.',
+ nt:'',src:'Gan et al. 4th PONV consensus 2020; SmPC'},
+
+/* ================= ANALGESIA (NON-OPIOID) ================= */
+{id:'paracetamol',n:'Paracetamol (acetaminophen)',a:'Perfalgan, Panadol',c:'Analgesic (non-opioid)',
+ conc:'IV 10 mg/mL (1 g/100 mL); oral 500 mg tablets; syrup 120 mg/5 mL, 250 mg/5 mL',cc:[{l:'10 mg/mL IV',v:10}],
+ d:[{i:'Adult ≥50 kg',t:'1 g IV/PO q6h (max 4 g/day)',k:{v:[1000,1000],u:'mg'}},
+    {i:'Adult <50 kg or risk factors',t:'15 mg/kg q6h (max 60 mg/kg/day, max 3 g/day) — malnutrition, chronic alcohol, hepatic impairment, low body weight',k:{v:[15,15],u:'mg/kg',s:'TBW',cap:1000}},
+    {i:'Max daily',t:'60 mg/kg/day, not exceeding 4 g/day',k:{v:[60,60],u:'mg/kg/day',s:'TBW',cap:4000,x:1}}],
+ p:[{i:'IV (>10 kg)',t:'15 mg/kg q6h (max 60 mg/kg/day)',k:{v:[15,15],u:'mg/kg',cap:1000}},
+    {i:'IV (term neonate/infant ≤10 kg)',t:'7.5–10 mg/kg q6h (max 30 mg/kg/day)',k:{v:[7.5,10],u:'mg/kg'}},
+    {i:'Oral',t:'15 mg/kg q4–6h (max 75 mg/kg/day, ≤4 g)',k:{v:[15,15],u:'mg/kg',cap:1000}}],
+ mx:'Hepatotoxicity via NAPQI (glutathione depletion). Overdose ≥75 mg/kg/24 h (or staggered/high-risk) → assess for N-acetylcysteine (UK nomogram line 100 mg/L at 4 h). IV mg vs mL errors in infants cause 10-fold overdoses.',
+ on:'IV 5–10 min (peak 1 h); PO 30–60 min',du:'4–6 h',
+ ph:'Central COX inhibition (peroxidase site, effective in low-peroxide CNS environment), descending serotonergic pathway activation, AM404 (TRPV1/cannabinoid). Weak peripheral anti-inflammatory action. Hepatic glucuronidation/sulphation; ~5% CYP2E1 → NAPQI.',
+ ind:'Mild–moderate pain, multimodal analgesia, fever.',
+ ci:'Severe hepatic impairment, hypersensitivity.',
+ nt:'',src:'BNF/BNFc; SmPC (IV)'},
+{id:'parecoxib',n:'Parecoxib',a:'Dynastat',c:'Analgesic (non-opioid)',
+ conc:'40 mg powder',cc:[{l:'20 mg/mL (reconstituted)',v:20}],
+ d:[{i:'Analgesia',t:'40 mg IV/IM, then 20–40 mg q6–12h (max 80 mg/day); elderly <50 kg: 20 mg, max 40 mg/day',k:{v:[40,40],u:'mg'}},
+    {i:'Max daily',t:'80 mg/day',k:{v:[80,80],u:'mg',x:1}}],
+ p:[{i:'—',t:'Not licensed in children'}],
+ mx:'Max 80 mg/day, max 3 days typical. CV thrombotic events, renal impairment, GI effects (lower than non-selective).',
+ on:'7–13 min (IV)',du:'6–12 h',
+ ph:'Prodrug rapidly hydrolysed to valdecoxib (selective COX-2 inhibitor). No antiplatelet effect.',
+ ind:'Short-term post-operative pain.',
+ ci:'Post-CABG pain (absolute); IHD, cerebrovascular or peripheral arterial disease; HF NYHA II–IV; active peptic ulcer/GI bleed; IBD; severe hepatic impairment; sulphonamide allergy; 3rd trimester; NSAID-induced asthma.',
+ nt:'',src:'SmPC (Dynastat)'},
+{id:'ketorolac',n:'Ketorolac',a:'Toradol',c:'Analgesic (non-opioid)',
+ conc:'30 mg/mL',cc:[{l:'30 mg/mL',v:30}],
+ d:[{i:'Analgesia',t:'10–30 mg IV/IM q6h (15 mg if >65 y, <50 kg or renal impairment); max 90 mg/day (60 mg elderly); max 2 days parenteral',k:{v:[15,30],u:'mg'}}],
+ p:[{i:'Analgesia (>6 months, off-licence in some regions)',t:'0.5 mg/kg IV (max 15–30 mg)',k:{v:[0.5,0.5],u:'mg/kg',cap:15}}],
+ mx:'Max 90 mg/day (60 mg elderly). GI bleeding, AKI, platelet dysfunction, bronchospasm in NSAID-sensitive asthma.',
+ on:'~30 min (analgesia)',du:'4–6 h',
+ ph:'Non-selective COX inhibitor (pyrrolizine carboxylic acid); potent analgesic, moderate anti-inflammatory. Reversible platelet inhibition. Renal excretion.',
+ ind:'Moderate–severe acute post-operative pain (short term), renal colic.',
+ ci:'Active PUD/GI bleed, bleeding disorders/anticoagulation, renal impairment, hypovolaemia, NSAID-exacerbated asthma, 3rd trimester, perioperative CABG, cerebrovascular bleeding.',
+ nt:'',src:'SmPC; BNF'},
+
+/* ================= EMERGENCY ================= */
+{id:'dantrolene',n:'Dantrolene',a:'Dantrium, Revonto; Ryanodex (250 mg/5 mL)',c:'Emergency',
+ conc:'20 mg vial + 3 g mannitol, reconstitute with 60 mL water for injection (0.33 mg/mL). Ryanodex 250 mg vial in 5 mL',cc:[{l:'0.33 mg/mL (20 mg/60 mL)',v:0.333}],vial:{mg:20,l:'20 mg vials'},
+ d:[{i:'MH crisis — initial',t:'2.5 mg/kg IV (AAGBI 2020: 2–3 mg/kg; EMHG 2024: 2–2.5 mg/kg)',k:{v:[2,3],u:'mg/kg',s:'TBW'}},
+    {i:'MH crisis — repeat',t:'1 mg/kg every 5–10 min until ETCO2 <6 kPa and core temp <38.5 °C',k:{v:[1,1],u:'mg/kg',s:'TBW'}},
+    {i:'Usual cumulative max',t:'10 mg/kg (may be exceeded — reconsider diagnosis if no response)',k:{v:[10,10],u:'mg/kg',s:'TBW',x:1}},
+    {i:'Post-crisis',t:'1 mg/kg q4–6h for 24 h (ICU)'}],
+ p:[{i:'MH crisis',t:'Same mg/kg dosing as adults: 2.5 mg/kg then 1 mg/kg boluses',k:{v:[2.5,2.5],u:'mg/kg'}}],
+ mx:'Muscle weakness (may need ventilation), phlebitis (pH 9.5 — large vein), diuresis (mannitol), hepatotoxicity with chronic oral use. Avoid calcium channel blockers (hyperkalaemia/myocardial depression).',
+ on:'Minutes (response within 10–20 min)',du:'t½ 6–12 h',
+ ph:'Hydantoin derivative; ryanodine receptor (RyR1) antagonist → ↓Ca2+ release from sarcoplasmic reticulum, uncoupling excitation–contraction in skeletal muscle. Hepatic metabolism.',
+ ind:'Malignant hyperthermia; also NMS, serotonin syndrome (adjunct), spasticity (oral).',
+ ci:'None in MH crisis.',
+ nt:'Reconstitution is slow — allocate dedicated helpers. Stop triggers, hyperventilate (100% O2, high flows), activated charcoal filters, active cooling, treat hyperK (calcium, insulin-dextrose), arrhythmias (amiodarone/β-blocker; avoid CCB).',
+ src:'Hopkins et al. AAGBI MH 2020 (Anaesthesia 2021); EMHG 2024 (BJA 2025); MHAUS'},
+{id:'lipid',n:'Lipid emulsion 20%',a:'Intralipid',c:'Emergency',
+ conc:'20% (200 mg/mL) — 100 mL, 250 mL, 500 mL bags',cc:[],
+ d:[{i:'LAST — ≤70 kg bolus',t:'1.5 mL/kg (lean body weight) over 2–3 min',k:{v:[1.5,1.5],u:'mL/kg',s:'LBW'}},
+    {i:'LAST — ≤70 kg infusion',t:'0.25 mL/kg/min (LBW); if unstable repeat bolus 1–2× and double to 0.5 mL/kg/min',k:{v:[0.25,0.25],u:'mL/kg/min',s:'LBW'}},
+    {i:'LAST — >70 kg (ASRA 2020)',t:'100 mL over 2–3 min, then 200–250 mL over 15–20 min'},
+    {i:'Continue',t:'≥15 min after haemodynamic stability'},
+    {i:'Max dose',t:'~12 mL/kg (LBW)',k:{v:[12,12],u:'mL/kg',s:'LBW',x:1}}],
+ p:[{i:'LAST bolus',t:'1.5 mL/kg over 2–3 min',k:{v:[1.5,1.5],u:'mL/kg'}},
+    {i:'LAST infusion',t:'0.25 mL/kg/min (double if unstable)',k:{v:[0.25,0.25],u:'mL/kg/min'}},
+    {i:'Max',t:'12 mL/kg (some paediatric sources advise lower)',k:{v:[12,12],u:'mL/kg',x:1}}],
+ mx:'Max ~12 mL/kg. Fat overload: pancreatitis, lipaemia interfering with labs, ARDS, fat embolism (rare).',
+ on:'Minutes',du:'Continue infusion; LA redistribution — prolonged CPR may be needed (≥60 min)',
+ ph:'"Lipid sink"/lipid shuttle — sequesters lipophilic LA and redistributes it to liver/muscle; also direct cardiotonic and metabolic effects.',
+ ind:'LAST (CNS or CVS); consider for other lipophilic drug toxicity.',
+ ci:'None in LAST. Propofol is NOT a substitute.',
+ nt:'LAST management: stop LA, call for help, airway/100% O2, benzodiazepine for seizures, CPR with small-dose adrenaline (<1 mcg/kg); avoid vasopressin, CCBs, β-blockers, further LA. Consider CPB/ECMO. Observe ≥2 h after seizure, 4–6 h after CVS instability. UK AAGBI alternative: 1.5 mL/kg over 1 min then 15 mL/kg/h.',
+ src:'ASRA LAST checklist 2020 (Neal et al. RAPM 2021); AAGBI LAST 2010'},
+{id:'cacl',n:'Calcium chloride 10%',a:'',c:'Emergency',
+ conc:'10% = 100 mg/mL (6.8 mmol Ca2+ per 10 mL)',cc:[{l:'10%',v:100}],
+ d:[{i:'HyperK / CCB toxicity / hypocalcaemia / Mg toxicity',t:'10 mL 10% IV over 2–5 min (faster in arrest), repeat as needed',k:{v:[1000,1000],u:'mg'}},
+    {i:'Massive transfusion',t:'10 mL 10% per ~4 units blood, guided by ionised Ca2+ (target >1.0–1.1 mmol/L)'}],
+ p:[{i:'Bolus',t:'0.2 mL/kg of 10% (20 mg/kg) IV, max 10 mL',k:{v:[0.2,0.2],u:'mL/kg',cap:10}}],
+ mx:'Severe tissue necrosis on extravasation — central line preferred. Bradycardia/arrhythmia with rapid injection, digoxin toxicity potentiation.',
+ on:'Immediate',du:'30–60 min (membrane stabilisation)',
+ ph:'Provides ionised Ca2+ (3× more elemental calcium than gluconate per mL). Stabilises cardiac membrane threshold potential in hyperkalaemia; positive inotrope.',
+ ind:'Hyperkalaemia with ECG changes, hypocalcaemia, CCB/β-blocker toxicity, hypermagnesaemia, massive transfusion.',
+ ci:'Hypercalcaemia; caution digoxin toxicity. Incompatible with bicarbonate (precipitates).',
+ nt:'',src:'RCUK ALS 2021; UKKA hyperkalaemia 2020'},
+{id:'cagluc',n:'Calcium gluconate 10%',a:'',c:'Emergency',
+ conc:'10% = 100 mg/mL (2.2 mmol Ca2+ per 10 mL)',cc:[{l:'10%',v:100}],
+ d:[{i:'HyperK with ECG changes',t:'30 mL 10% IV over 5–10 min (repeat if ECG changes persist)',k:{v:[3000,3000],u:'mg'}},
+    {i:'Mg toxicity',t:'10–20 mL 10% IV over 10 min'}],
+ p:[{i:'Bolus',t:'0.5 mL/kg of 10% IV (max 20 mL)',k:{v:[0.5,0.5],u:'mL/kg',cap:20}}],
+ mx:'Less irritant than chloride; still avoid extravasation.',
+ on:'Immediate',du:'30–60 min',
+ ph:'Ionised calcium source (~1/3 elemental Ca2+ of CaCl2 per mL). Peripheral use acceptable.',
+ ind:'Hyperkalaemia, hypocalcaemia, magnesium toxicity.',
+ ci:'Hypercalcaemia; caution digoxin.',
+ nt:'',src:'UKKA hyperkalaemia 2020; RCUK'},
+{id:'bicarb',n:'Sodium bicarbonate 8.4%',a:'',c:'Emergency',
+ conc:'8.4% = 1 mmol/mL; 4.2% (0.5 mmol/mL) for neonates',cc:[],
+ d:[{i:'TCA / Na+ channel blocker toxicity, hyperK with acidosis',t:'50 mmol (50 mL 8.4%) IV, repeat guided by pH/ECG',k:{v:[1,1],u:'mL/kg',s:'TBW',cap:50}}],
+ p:[{i:'Bolus',t:'1 mmol/kg (1 mL/kg 8.4%; use 4.2% in neonates)',k:{v:[1,1],u:'mL/kg',cap:50}}],
+ mx:'Hypernatraemia, hyperosmolality, metabolic alkalosis, hypokalaemia, ↓ionised Ca2+, paradoxical intracellular acidosis (CO2 generation — ensure ventilation), extravasation necrosis.',
+ on:'Immediate',du:'Variable',
+ ph:'HCO3− buffers H+ → H2CO3 → CO2 + H2O (requires adequate ventilation). Alkalinisation and Na+ load reverse Na+ channel blockade (QRS widening).',
+ ind:'TCA overdose, severe metabolic acidosis (selected), hyperkalaemia with acidosis, prolonged arrest with hyperK.',
+ ci:'Metabolic/respiratory alkalosis, hypocalcaemia (relative). Do not mix with calcium or catecholamines.',
+ nt:'',src:'RCUK ALS 2021; Toxbase'},
+{id:'hydrocortisone',n:'Hydrocortisone',a:'Solu-Cortef',c:'Emergency',
+ conc:'100 mg vial',cc:[{l:'50 mg/mL (reconstituted)',v:50}],
+ d:[{i:'Adrenal crisis',t:'100 mg IV/IM, then 200 mg/24 h infusion (or 50 mg q6h)',k:{v:[100,100],u:'mg'}},
+    {i:'Perioperative cover (on steroids, major surgery)',t:'100 mg IV at induction, then 200 mg/24 h infusion (AoA 2020)'},
+    {i:'Anaphylaxis (refractory/after initial resus)',t:'200 mg IV'},
+    {i:'Acute severe asthma',t:'100 mg IV q6h'}],
+ p:[{i:'Adrenal crisis',t:'2 mg/kg IV (max 100 mg)',k:{v:[2,2],u:'mg/kg',cap:100}},
+    {i:'Anaphylaxis (age)',t:'<6 m 25 mg; 6 m–6 y 50 mg; 6–12 y 100 mg; >12 y 200 mg'}],
+ mx:'Hyperglycaemia, fluid retention, hypokalaemia, psychiatric effects; perineal irritation with rapid IV.',
+ on:'1–2 h (clinical); some non-genomic effects sooner',du:'Biological 8–12 h',
+ ph:'Endogenous glucocorticoid (cortisol) with significant mineralocorticoid activity (1:1). Reference glucocorticoid potency 1.',
+ ind:'Adrenal crisis/insufficiency, perioperative steroid cover, refractory anaphylaxis, asthma, refractory septic shock.',
+ ci:'Systemic fungal infection (non-emergency); live vaccines.',
+ nt:'',src:'Association of Anaesthetists glucocorticoid guideline 2020; RCUK anaphylaxis 2021'},
+{id:'chlorphenamine',n:'Chlorphenamine (chlorpheniramine)',a:'Piriton',c:'Emergency',
+ conc:'10 mg/mL',cc:[{l:'10 mg/mL',v:10}],
+ d:[{i:'Allergy / anaphylaxis (after stabilisation)',t:'10 mg slow IV/IM',k:{v:[10,10],u:'mg'}}],
+ p:[{i:'Allergy (age)',t:'6 m–6 y 2.5 mg; 6–12 y 5 mg; >12 y 10 mg (IV/IM)'}],
+ mx:'Sedation, hypotension with rapid IV, anticholinergic effects, paradoxical excitation in children.',
+ on:'IV 5–15 min',du:'4–6 h',
+ ph:'First-generation H1 antagonist (alkylamine); sedating, anticholinergic. Not a first-line drug in anaphylaxis (adrenaline is).',
+ ind:'Cutaneous allergic symptoms, adjunct after anaphylaxis stabilisation.',
+ ci:'Hypersensitivity; caution in elderly, glaucoma, prostatic hypertrophy.',
+ nt:'',src:'RCUK anaphylaxis 2021; BNF'},
+{id:'txa',n:'Tranexamic acid',a:'Cyklokapron',c:'Emergency',
+ conc:'100 mg/mL (500 mg/5 mL)',cc:[{l:'100 mg/mL',v:100}],
+ d:[{i:'Trauma (CRASH-2)',t:'1 g IV over 10 min within 3 h of injury, then 1 g over 8 h',k:{v:[1000,1000],u:'mg'}},
+    {i:'PPH (WOMAN)',t:'1 g IV over 10 min; repeat 1 g if bleeding continues after 30 min or restarts within 24 h'},
+    {i:'Arthroplasty / elective',t:'1 g IV (or 10–20 mg/kg) before incision ± repeat',k:{v:[10,20],u:'mg/kg',s:'TBW',cap:1000}}],
+ p:[{i:'Trauma / surgery',t:'15 mg/kg IV (max 1 g) over 10 min, then 2 mg/kg/h for 8 h (trauma)',k:{v:[15,15],u:'mg/kg',cap:1000}}],
+ mx:'Seizures at high doses (cardiac surgery >50–100 mg/kg) and in renal failure. INTRATHECAL INJECTION IN ERROR (ampoule confusion with LA) → seizures, arrhythmias, death — keep separate from neuraxial trays.',
+ on:'5–15 min',du:'t½ ~2 h; antifibrinolytic effect ~7–8 h',
+ ph:'Synthetic lysine analogue; blocks lysine-binding sites on plasminogen → prevents plasmin binding to fibrin (antifibrinolytic). Renal excretion unchanged — reduce in renal impairment.',
+ ind:'Trauma haemorrhage, PPH, orthopaedic/cardiac/major surgery, menorrhagia, dental bleeding in coagulopathy.',
+ ci:'Active thromboembolism, history of seizures (relative), severe renal impairment (dose-adjust), subarachnoid haemorrhage (relative).',
+ nt:'',src:'CRASH-2 (Lancet 2010); WOMAN (Lancet 2017); SmPC'},
+{id:'insulin',n:'Insulin (soluble) — hyperkalaemia',a:'Actrapid',c:'Emergency',
+ conc:'100 units/mL',cc:[{l:'100 units/mL',v:100,u:'units'}],
+ d:[{i:'Hyperkalaemia (K+ ≥6.5 or ECG changes)',t:'10 units soluble insulin + 25 g glucose IV over 15 min (e.g., 50 mL 50% or 250 mL 10%); monitor CBG hourly ≥6 h; 10% glucose infusion if pre-treatment CBG <7 mmol/L',k:{v:[10,10],u:'units'}}],
+ p:[{i:'Hyperkalaemia',t:'Follow local paediatric protocol (e.g., 0.1 units/kg with 0.5 g/kg glucose)',k:{v:[0.1,0.1],u:'units/kg',cap:10}}],
+ mx:'Hypoglycaemia (common, may be delayed up to 6 h). Hypokalaemia overshoot.',
+ on:'15–30 min (K+ shift)',du:'4–6 h',
+ ph:'Activates Na+/K+-ATPase → intracellular shift of K+ (lowers K+ ~0.6–1 mmol/L). Glucose prevents hypoglycaemia.',
+ ind:'Hyperkalaemia (temporising).',
+ ci:'Hypoglycaemia.',
+ nt:'Insulin-dextrose shifts K+ — does not remove it. Plan definitive removal (dialysis, binders) and treat cause.',
+ src:'UK Kidney Association hyperkalaemia 2020; RCUK ALS 2021'},
+{id:'salbutamol',n:'Salbutamol (albuterol)',a:'Ventolin',c:'Emergency',
+ conc:'Nebules 2.5 mg/2.5 mL, 5 mg/2.5 mL; IV 500 mcg/mL (dilute); MDI 100 mcg/puff',cc:[],
+ d:[{i:'Bronchospasm (nebulised)',t:'2.5–5 mg neb, repeat; or MDI 4–10 puffs via inline adapter (intubated)'},
+    {i:'Bronchospasm (IV)',t:'250 mcg slow IV (5 mcg/kg), then 5–20 mcg/min infusion'},
+    {i:'Hyperkalaemia',t:'10–20 mg nebulised'}],
+ p:[{i:'Nebulised',t:'2.5 mg (<5 y) – 5 mg (≥5 y)'},
+    {i:'IV',t:'15 mcg/kg (max 250 mcg) over 10 min, then 1–2 mcg/kg/min',k:{v:[15,15],u:'mcg/kg',cap:250}}],
+ mx:'Tachycardia, arrhythmias, tremor, hypokalaemia, lactic acidosis, hyperglycaemia.',
+ on:'Neb 5 min; IV 1–2 min',du:'4–6 h (neb)',
+ ph:'Selective β2 agonist → ↑cAMP → bronchial smooth muscle relaxation; also shifts K+ intracellularly.',
+ ind:'Bronchospasm (asthma, anaphylaxis), hyperkalaemia adjunct.',
+ ci:'Hypersensitivity; caution tachyarrhythmias, hyperthyroidism.',
+ nt:'',src:'BTS/SIGN asthma; BNFc'},
+{id:'glucagon',n:'Glucagon',a:'GlucaGen',c:'Emergency',
+ conc:'1 mg vial (1 mg/mL reconstituted)',cc:[{l:'1 mg/mL',v:1}],
+ d:[{i:'Anaphylaxis refractory on β-blockers',t:'1–2 mg IV/IM q5 min (RCUK/ANZCA)'},
+    {i:'β-blocker / CCB overdose',t:'50–150 mcg/kg (5–10 mg) IV over 1–2 min, then infusion 1–5 mg/h (specialist)'},
+    {i:'Hypoglycaemia (no IV access)',t:'1 mg IM/SC'}],
+ p:[{i:'Hypoglycaemia',t:'<25 kg (or <8 y): 0.5 mg; ≥25 kg: 1 mg IM'}],
+ mx:'Nausea/vomiting (common — protect airway), hyperglycaemia, hypokalaemia.',
+ on:'IV 1–3 min',du:'10–20 min',
+ ph:'Polypeptide hormone; glucagon receptor → adenylate cyclase → ↑cAMP independent of β-receptors (positive inotrope/chronotrope). Glycogenolysis.',
+ ind:'Refractory anaphylaxis with β-blockade, β-blocker/CCB toxicity, hypoglycaemia, sphincter of Oddi relaxation.',
+ ci:'Phaeochromocytoma, insulinoma.',
+ nt:'',src:'RCUK anaphylaxis 2021; Toxbase'},
+{id:'methyleneblue',n:'Methylene blue (methylthioninium)',a:'Proveblue',c:'Emergency',
+ conc:'5 mg/mL (0.5%); 10 mg/mL (1%)',cc:[{l:'5 mg/mL',v:5},{l:'10 mg/mL',v:10}],
+ d:[{i:'Methaemoglobinaemia',t:'1–2 mg/kg IV over 5 min, repeat after 1 h if needed (max 7 mg/kg)',k:{v:[1,2],u:'mg/kg',s:'LBW'}},
+    {i:'Refractory vasoplegia',t:'1–2 mg/kg IV over 20 min (off-label)'}],
+ p:[{i:'Methaemoglobinaemia',t:'1–2 mg/kg IV over 5 min',k:{v:[1,2],u:'mg/kg'}}],
+ mx:'Serotonin syndrome with SSRIs/SNRIs/MAOIs (MAO-A inhibitor). Haemolysis in G6PD deficiency; paradoxical methaemoglobinaemia at high doses (>7 mg/kg). Falsely low SpO2 (transient). Blue urine.',
+ on:'Minutes',du:'Variable',
+ ph:'Acts as electron acceptor via NADPH-methaemoglobin reductase → reduces leukomethylene blue, which reduces MetHb to Hb. Inhibits guanylate cyclase/NOS (vasoplegia).',
+ ind:'Methaemoglobinaemia (prilocaine, nitrates, dapsone), vasoplegic shock (specialist).',
+ ci:'G6PD deficiency, serotonergic drugs, severe renal impairment.',
+ nt:'',src:'SmPC (Proveblue); Toxbase'},
+
+/* ================= OBSTETRIC ================= */
+{id:'oxytocin',n:'Oxytocin',a:'Syntocinon, Pitocin',c:'Obstetric',
+ conc:'5 units/mL or 10 units/mL',cc:[{l:'5 units/mL',v:5,u:'units'},{l:'10 units/mL',v:10,u:'units'}],
+ d:[{i:'Elective CS (Heesen 2019 consensus)',t:'1 unit slow IV + infusion 2.5–7.5 units/h'},
+    {i:'Intrapartum CS (Heesen 2019)',t:'3 units slow IV + infusion 7.5–15 units/h ("rule of threes": 3 units q2–3 min ×3, then second-line agent)'},
+    {i:'Common UK practice',t:'5 units slow IV (over ≥1–2 min) then 40 units in 500 mL over 4 h — follow local protocol'}],
+ p:[{i:'—',t:'Not applicable'}],
+ mx:'Rapid bolus → hypotension, tachycardia, myocardial ischaemia, ST changes (avoid >5 units bolus; give slowly). Water intoxication/hyponatraemia with prolonged high-dose infusion (ADH-like). Receptor desensitisation after prolonged labour augmentation.',
+ on:'~1 min IV',du:'t½ 3–5 min (infusion required for sustained tone)',
+ ph:'Synthetic posterior pituitary nonapeptide; uterine oxytocin receptors (Gq) → contraction. Structural similarity to vasopressin (antidiuresis). Peripheral vasodilation.',
+ ind:'Prevention/treatment of uterine atony at CS/vaginal delivery, PPH, induction/augmentation of labour.',
+ ci:'Hypertonic uterus, fetal distress (for induction), severe CVS disease (caution with bolus).',
+ nt:'',src:'Heesen et al. Anaesthesia 2019; RCOG Green-top 52'},
+{id:'carbetocin',n:'Carbetocin',a:'Pabal, Duratocin',c:'Obstetric',
+ conc:'100 mcg/mL',cc:[{l:'100 mcg/mL',v:0.1}],
+ d:[{i:'Elective CS',t:'100 mcg slow IV over 1 min after delivery (lower doses e.g., 20 mcg studied)',k:{v:[100,100],u:'mcg'}}],
+ p:[{i:'—',t:'Not applicable'}],
+ mx:'Hypotension, tachycardia, flushing, headache, nausea; similar CVS effects to oxytocin bolus.',
+ on:'~2 min',du:'~1 h (t½ ~40 min)',
+ ph:'Long-acting synthetic oxytocin analogue (N-terminal modification resists aminopeptidase); heat-stable formulation available.',
+ ind:'Prevention of uterine atony after CS (and vaginal delivery in some regions).',
+ ci:'Pre-eclampsia/eclampsia (licence), serious CVS disease, epilepsy, hepatic/renal disease; not for labour induction.',
+ nt:'',src:'SmPC; Heesen 2019'},
+{id:'carboprost',n:'Carboprost',a:'Hemabate',c:'Obstetric',
+ conc:'250 mcg/mL',cc:[{l:'250 mcg/mL',v:0.25}],
+ d:[{i:'PPH (atony)',t:'250 mcg deep IM (or intramyometrial by obstetrician), repeat q15 min, max 8 doses (2 mg)',k:{v:[250,250],u:'mcg'}},
+    {i:'Max',t:'2 mg (8 doses)',k:{v:[2,2],u:'mg',x:1}}],
+ p:[{i:'—',t:'Not applicable'}],
+ mx:'Max 2 mg. Bronchospasm, pulmonary hypertension, hypoxaemia, vomiting, diarrhoea, pyrexia.',
+ on:'15 min (IM)',du:'~2 h',
+ ph:'15-methyl PGF2α analogue → strong myometrial contraction; bronchial/vascular smooth muscle constriction.',
+ ind:'PPH due to uterine atony unresponsive to oxytocin/ergometrine.',
+ ci:'Asthma (relative — bronchospasm), cardiac, pulmonary, renal or hepatic disease.',
+ nt:'Never IV.',src:'RCOG Green-top 52; SmPC'},
+{id:'ergometrine',n:'Ergometrine',a:'Syntometrine (+ oxytocin 5 units)',c:'Obstetric',
+ conc:'500 mcg/mL',cc:[{l:'500 mcg/mL',v:0.5}],
+ d:[{i:'PPH',t:'500 mcg IM, or 250–500 mcg slow IV (diluted, over ≥1 min); Syntometrine 1 mL IM',k:{v:[0.25,0.5],u:'mg'}}],
+ p:[{i:'—',t:'Not applicable'}],
+ mx:'Severe hypertension, coronary vasospasm, vomiting (common), cerebrovascular events.',
+ on:'IV 1 min; IM 2–3 min',du:'3–6 h',
+ ph:'Ergot alkaloid; α-adrenergic, dopaminergic and 5-HT2 agonism → sustained tetanic uterine contraction; vasoconstriction.',
+ ind:'Prevention/treatment of PPH.',
+ ci:'Pre-eclampsia/hypertension, cardiac disease, peripheral vascular disease, severe hepatic/renal impairment, sepsis.',
+ nt:'',src:'RCOG Green-top 52; SmPC'},
+
+/* ================= ANTICOAGULATION ================= */
+{id:'heparin',n:'Heparin (unfractionated)',a:'UFH',c:'Anticoagulation',
+ conc:'1,000 units/mL; 5,000 units/mL (also 5,000 units/0.2 mL SC)',cc:[{l:'1,000 units/mL',v:1000,u:'units'},{l:'5,000 units/mL',v:5000,u:'units'}],
+ d:[{i:'Vascular clamping',t:'50–100 units/kg IV (often 5,000 units); ACT 200–300 s',k:{v:[50,100],u:'units/kg',s:'TBW'}},
+    {i:'Cardiopulmonary bypass',t:'300–400 units/kg IV; ACT >400–480 s',k:{v:[300,400],u:'units/kg',s:'TBW'}},
+    {i:'VTE prophylaxis',t:'5,000 units SC q8–12h'}],
+ p:[{i:'—',t:'Specialist use (CPB 300–400 units/kg)'}],
+ mx:'Bleeding; HIT type II (5–14 days, PF4-heparin antibodies; thrombosis). Hyperkalaemia (aldosterone suppression).',
+ on:'IV immediate; SC 20–60 min',du:'IV t½ 60–90 min (dose-dependent)',
+ ph:'Glycosaminoglycan; binds antithrombin III → ~1000× acceleration of inhibition of IIa and Xa (and IXa, XIa, XIIa). Reticuloendothelial + renal clearance. Monitored by aPTT/ACT. Reversed by protamine.',
+ ind:'Vascular/cardiac surgery, VTE treatment/prophylaxis, ECMO, haemofiltration.',
+ ci:'HIT, active bleeding, severe thrombocytopenia.',
+ nt:'Neuraxial (ASRA 2018 / AoA 2013 — check local): SC prophylaxis — wait 4–6 h before block/catheter removal; IV — stop 4–6 h and check aPTT; restart ≥1 h after.',
+ src:'ASRA anticoagulation 2018; AAGBI/OAA/RA-UK 2013; SmPC'},
+{id:'protamine',n:'Protamine',a:'',c:'Anticoagulation',
+ conc:'10 mg/mL',cc:[{l:'10 mg/mL',v:10}],
+ d:[{i:'Heparin reversal',t:'1 mg per 100 units heparin remaining (estimate from time since dose); slow IV ≤5 mg/min; max 50 mg per dose',k:{v:[50,50],u:'mg',x:1}},
+    {i:'LMWH (partial)',t:'1 mg per 1 mg enoxaparin (if given within 8 h) — ~60% anti-Xa reversal'}],
+ p:[{i:'—',t:'1 mg per 100 units heparin (specialist)'}],
+ mx:'Max 50 mg per dose. Reactions: hypotension (rapid injection), anaphylactoid/anaphylaxis, catastrophic pulmonary vasoconstriction (RV failure). Excess protamine is itself anticoagulant. Risk factors: NPH insulin, fish allergy, vasectomy, prior exposure.',
+ on:'~5 min',du:'~2 h (heparin rebound possible)',
+ ph:'Strongly basic polycationic protein (from salmon sperm) forming inactive ionic complex with heparin.',
+ ind:'Reversal of UFH (post-CPB, vascular surgery), partial LMWH reversal.',
+ ci:'Known hypersensitivity.',
+ nt:'',src:'SmPC; BNF'},
+{id:'enoxaparin',n:'Enoxaparin',a:'Clexane, Lovenox',c:'Anticoagulation',
+ conc:'100 mg/mL prefilled (20, 40, 60, 80, 100 mg …)',cc:[{l:'100 mg/mL',v:100}],
+ d:[{i:'VTE prophylaxis',t:'40 mg SC daily (20 mg if CrCl <30 mL/min; consider weight-adjusted in obesity)',k:{v:[40,40],u:'mg'}},
+    {i:'Treatment',t:'1 mg/kg SC q12h or 1.5 mg/kg daily',k:{v:[1,1],u:'mg/kg',s:'TBW'}}],
+ p:[{i:'—',t:'Specialist use'}],
+ mx:'Bleeding; spinal/epidural haematoma if timing guidelines not followed; accumulates in renal impairment; HIT (lower risk than UFH).',
+ on:'SC peak 3–5 h',du:'~12 h (prophylaxis), longer in renal impairment',
+ ph:'LMWH; antithrombin-mediated anti-Xa > anti-IIa (ratio ~3.8:1). Predictable kinetics; renal excretion. Monitored by anti-Xa. Partially reversed by protamine.',
+ ind:'VTE prophylaxis/treatment, ACS, bridging.',
+ ci:'Active bleeding, HIT history, severe thrombocytopenia.',
+ nt:'Neuraxial (check local): block/catheter removal ≥12 h after prophylactic dose, ≥24 h after treatment dose; next dose ≥4 h after catheter removal (ASRA 2018 / RA-UK).',
+ src:'ASRA anticoagulation 2018; AAGBI/OAA/RA-UK 2013; SmPC'},
+
+/* ================= ANTIBIOTIC PROPHYLAXIS ================= */
+{id:'cefazolin',n:'Cefazolin',a:'Kefzol, Ancef',c:'Antibiotic prophylaxis',
+ conc:'1 g, 2 g vials',cc:[{l:'100 mg/mL (1 g/10 mL)',v:100}],
+ d:[{i:'Surgical prophylaxis',t:'2 g IV within 60 min of incision (3 g if ≥120 kg); redose 2 g every 4 h or with blood loss >1.5 L',k:{v:[2000,2000],u:'mg'}}],
+ p:[{i:'Surgical prophylaxis',t:'30 mg/kg IV (max 2 g)',k:{v:[30,30],u:'mg/kg',cap:2000}}],
+ mx:'Anaphylaxis (cross-reactivity with penicillin low, ~1% — dissimilar side chain); seizures at very high doses in renal failure.',
+ on:'Give 15–60 min before incision',du:'Redose q4h intraop',
+ ph:'First-generation cephalosporin (β-lactam); inhibits cell-wall synthesis (PBP). Good Gram-positive (MSSA, streptococci) cover. Renal excretion.',
+ ind:'Surgical antibiotic prophylaxis (most clean/clean-contaminated procedures).',
+ ci:'Severe immediate β-lactam allergy (history of cephalosporin anaphylaxis). Non-severe penicillin allergy is not a contraindication.',
+ nt:'Follow local antibiotic guideline.',
+ src:'ASHP/IDSA/SIS/SHEA 2013 surgical prophylaxis guidelines'},
+
+/* ================= VOLATILES ================= */
+{id:'sevoflurane',n:'Sevoflurane',a:'Sevorane, Ultane',c:'Volatile / gas',
+ conc:'Liquid; vaporiser 0–8%',cc:[],mac:2.0,
+ d:[{i:'MAC (age 40, in O2)',t:'~2.0–2.1%'},
+    {i:'Inhalational induction',t:'Up to 8% (stepwise or single-breath)'},
+    {i:'Physical properties',t:'Blood:gas 0.65–0.69; oil:gas 47; BP 58.5 °C; SVP 21 kPa at 20 °C; MW 200'}],
+ p:[{i:'MAC by age',t:'Neonate ~3.3%; 1–6 months ~3.0%; children ~2.5%'}],
+ mx:'MH trigger. Compound A (renal toxicity in rats) with soda lime at low flows; fluoride (~3–5% metabolised). Emergence delirium in children.',
+ on:'Rapid (low blood:gas)',du:'Rapid offset',
+ ph:'Halogenated methyl isopropyl ether. Mechanism: GABA-A/glycine potentiation, K2P channel activation, NMDA inhibition. Non-pungent → ideal for inhalational induction. Bronchodilator; ↓SVR; minimal sensitisation to catecholamines. Metabolised (CYP2E1) to hexafluoroisopropanol + inorganic fluoride.',
+ ind:'Inhalational induction (esp. paediatric/difficult airway), maintenance of GA.',
+ ci:'MH susceptibility; caution in known hypersensitivity to halogenated agents.',
+ nt:'Age-adjusted MAC shown below if age entered (Mapleson 1996: ~6% fall per decade from 40 y).',
+ src:'Oxford Handbook of Anaesthesia; Mapleson BJA 1996'},
+{id:'desflurane',n:'Desflurane',a:'Suprane',c:'Volatile / gas',
+ conc:'Liquid; heated pressurised vaporiser (Tec 6, 39 °C, 2 atm)',cc:[],mac:6.0,
+ d:[{i:'MAC (age 40, in O2)',t:'~6.0–6.6%'},
+    {i:'Physical properties',t:'Blood:gas 0.42–0.45; oil:gas 19; BP 23.5 °C; SVP 89 kPa at 20 °C'}],
+ p:[{i:'MAC by age',t:'Infants ~9–10%; children ~8–8.6%'}],
+ mx:'MH trigger. Pungent → coughing, laryngospasm (not for induction). Sympathetic surge (tachycardia, hypertension) with rapid concentration increase >1 MAC. Carbon monoxide with desiccated absorbent. Very high global warming potential — many centres phasing out.',
+ on:'Fastest (lowest blood:gas)',du:'Fastest offset (good in obesity, long cases)',
+ ph:'Fluorinated methyl ethyl ether (fluorine replaces chlorine of isoflurane). Minimal metabolism (~0.02%). Low potency. GABA-A potentiation etc.',
+ ind:'Maintenance of GA where rapid emergence desired.',
+ ci:'MH susceptibility; inhalational induction; caution in CAD (tachycardia).',
+ nt:'',src:'Oxford Handbook of Anaesthesia'},
+{id:'isoflurane',n:'Isoflurane',a:'Forane',c:'Volatile / gas',
+ conc:'Liquid; vaporiser 0–5%',cc:[],mac:1.15,
+ d:[{i:'MAC (age 40, in O2)',t:'~1.15–1.17%'},
+    {i:'Physical properties',t:'Blood:gas 1.4; oil:gas 91–98; BP 48.5 °C; SVP 32–33 kPa at 20 °C'}],
+ p:[{i:'MAC by age',t:'Infants ~1.6–1.87%; children ~1.6%'}],
+ mx:'MH trigger. Pungent. Theoretical coronary steal. CO with desiccated absorbent.',
+ on:'Slower than sevo/des',du:'Slower offset',
+ ph:'Halogenated methyl ethyl ether (structural isomer of enflurane). ~0.2% metabolised. Dose-dependent ↓SVR; maintains CO (mild ↑HR); cerebral vasodilation (less than halothane); good muscle relaxation.',
+ ind:'Maintenance of GA; ICU sedation (AnaConDa).',
+ ci:'MH susceptibility.',
+ nt:'',src:'Oxford Handbook of Anaesthesia'},
+{id:'n2o',n:'Nitrous oxide',a:'Entonox (50:50 with O2)',c:'Volatile / gas',
+ conc:'Gas cylinder (blue); Entonox (blue/white)',cc:[],mac:104,
+ d:[{i:'MAC',t:'~104% (hypothetical — used as adjunct at 50–70%)'},
+    {i:'Physical properties',t:'Blood:gas 0.47; BP −88 °C; critical temp 36.5 °C; filling ratio 0.75; Entonox pseudocritical temp −5.5 °C (cylinder)'}],
+ p:[{i:'Entonox',t:'Self-administered analgesia (procedures, labour)'}],
+ mx:'Expands air-filled spaces (pneumothorax, bowel obstruction, middle ear, pneumocephalus, intraocular SF6/C3F8 gas — absolute CI). Diffusion hypoxia at end (give 100% O2). Methionine synthase inhibition (B12 oxidation) → megaloblastic anaemia, SACD with prolonged/repeated exposure. ↑PONV. Greenhouse gas and ozone depletion.',
+ on:'Rapid',du:'Rapid offset',
+ ph:'Inorganic gas; NMDA antagonist (analgesic), weak anaesthetic. Second-gas and concentration effects speed volatile uptake. Mild sympathomimetic; ↑PVR.',
+ ind:'Adjunct to GA, analgesia (Entonox), sedation.',
+ ci:'Pneumothorax, bowel obstruction, recent intraocular gas, middle ear surgery (relative), B12 deficiency, early pregnancy (relative).',
+ nt:'',src:'Oxford Handbook of Anaesthesia'}
+];
+
+</script>
+<script>
+/* Anaes Kit — offline drug reference + procedure log. Vanilla JS, no dependencies. */
+(function(){
+'use strict';
+const APP_VERSION = '1.0.0';
+const DRUGS = window.DRUGS || [];
+const $ = (s, el=document) => el.querySelector(s);
+const $$ = (s, el=document) => Array.from(el.querySelectorAll(s));
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+const nowIso = () => new Date().toISOString();
+const todayStr = () => { const d=new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10); };
+
+/* ---------------- storage ---------------- */
+const LS = {
+  get(k, d){ try{ const v = localStorage.getItem('ak.'+k); return v==null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem('ak.'+k, JSON.stringify(v)); }catch(e){ toast('Storage full or blocked — export a backup'); } }
+};
+const S = {
+  entries: LS.get('entries', []),        // procedure log records
+  drugmeta: LS.get('drugmeta', {}),      // {drugId:{verified:'YYYY-MM-DD'|null, note:'', updatedAt}}
+  patient: LS.get('patient', {wt:'',ht:'',age:'',sex:''}),
+  settings: LS.get('settings', {owner:'',repo:'',token:'',path:'anaes-kit-data.json',auto:true}),
+  sync: LS.get('sync', {lastSync:null, status:'off', msg:''}),
+  ui: {drugQ:'', drugCls:'All', logCat:'All', logQ:'', dashRange:'12m', dashCat:null, showTable:false}
+};
+function saveEntries(){ LS.set('entries', S.entries); scheduleSync(); }
+function saveMeta(){ LS.set('drugmeta', S.drugmeta); scheduleSync(); }
+try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
+
+/* ---------------- procedure taxonomy ---------------- */
+const CATS = [
+  {id:'airway', name:'Airway', color:'var(--s1)'},
+  {id:'neuraxial', name:'Neuraxial', color:'var(--s2)'},
+  {id:'block', name:'Nerve block', color:'var(--s3)'},
+  {id:'vascular', name:'Vascular access', color:'var(--s4)'},
+  {id:'case', name:'Anaesthetic case', color:'var(--s5)'},
+  {id:'other', name:'Other', color:'var(--s6)'}
+];
+const CAT = Object.fromEntries(CATS.map(c=>[c.id,c]));
+const PROCS = {
+  airway:['ETT – oral','ETT – nasal','SGA / LMA','Double-lumen tube','Bronchial blocker','Awake tracheal intubation','Asleep fibreoptic intubation','Front-of-neck access','Mask ventilation only','Tube exchange'],
+  neuraxial:['Spinal','Epidural – lumbar','Epidural – thoracic','Epidural – labour','CSE','Caudal','Epidural blood patch','Lumbar drain'],
+  block:['Interscalene','Supraclavicular','Infraclavicular','Axillary','Superficial cervical plexus','Deep cervical plexus','Suprascapular','Wrist / forearm','Femoral','Fascia iliaca','PENG','Lateral femoral cutaneous','Adductor canal','iPACK','Popliteal sciatic','Subgluteal / transgluteal sciatic','Lumbar plexus','Obturator','Ankle','TAP','Rectus sheath','Quadratus lumborum','ESP','Paravertebral','PECS I / II','Serratus anterior','Parasternal / PIFB','Intercostal','Ilioinguinal / iliohypogastric','Scalp block','Peribulbar / sub-Tenon','Bier\'s block (IVRA)','Other block'],
+  vascular:['Arterial line','CVC','PICC','Vascath / dialysis line','USS-guided peripheral IV','Large-bore / RIC line','Intraosseous','PA catheter','Midline'],
+  case:['General anaesthetic','GA + regional','Neuraxial anaesthetic','Regional anaesthetic (sole)','Sedation / MAC'],
+  other:['Gastric ultrasound','FoCUS / cardiac POCUS','Lung ultrasound','TOE','NG / OG tube','Chest drain','Lumbar puncture','Other']
+};
+const SITES = {
+  'Arterial line':['Radial','Brachial','Femoral','Dorsalis pedis','Ulnar','Axillary'],
+  'CVC':['Internal jugular','Subclavian','Femoral','Axillary'],
+  'Vascath / dialysis line':['Internal jugular','Femoral','Subclavian'],
+  'PICC':['Basilic','Brachial','Cephalic'],
+  'Large-bore / RIC line':['Antecubital','Femoral','Other'],
+  'Intraosseous':['Proximal tibia','Proximal humerus','Distal tibia'],
+  'PA catheter':['Internal jugular','Subclavian']
+};
+const SUPERVISION = ['Observed','Supervised (direct)','Supervised (indirect)','Independent','Teaching'];
+const LARYNGO = ['Direct – Macintosh','Direct – Miller/straight','VL – Macintosh blade','VL – hyperangulated','Flexible bronchoscope','Not applicable'];
+const CL = ['1','2a','2b','3a','3b','4'];
+const AW_ADJ = ['Bougie','Stylet','BURP / ELM','RSI','Apnoeic oxygenation / HFNO','Cricoid'];
+const COMPLIC = {
+  airway:['Desaturation <90%','Oesophageal intubation','Dental damage','Airway trauma','Aspiration','Laryngospasm'],
+  neuraxial:['Dural puncture','Bloody tap','Paraesthesia','Inadequate block','High block','Hypotension'],
+  block:['Paraesthesia','Vascular puncture','Inadequate block','LAST symptoms','Pneumothorax','Diaphragm paresis'],
+  vascular:['Arterial puncture','Haematoma','Pneumothorax','Malposition','Multiple punctures'],
+  case:['Unplanned ICU','Anaphylaxis','Cardiac arrest','Awareness'],
+  other:['Failed','Patient discomfort']
+};
+
+/* ---------------- patient & weight scalars ---------------- */
+function scalars(){
+  const p = S.patient, W = parseFloat(p.wt), H = parseFloat(p.ht);
+  if(!(W>0)) return null;
+  const out = {TBW:W, IBW:null, LBW:null, ABW:null, BMI:null};
+  if(H>0){
+    out.BMI = W/Math.pow(H/100,2);
+    if(p.sex==='M'||p.sex==='F'){
+      let ibw = (p.sex==='F'?45.5:50) + 0.91*(H-152.4);
+      if(ibw>0){ out.IBW = Math.min(ibw, W); out.ABW = out.IBW + 0.4*(W-out.IBW); }
+      out.LBW = p.sex==='F' ? 9270*W/(8780+244*out.BMI) : 9270*W/(6680+216*out.BMI);
+    }
+  }
+  return out;
+}
+const fmt = n => {
+  if(n==null||!isFinite(n)) return '–';
+  const a = Math.abs(n);
+  let s;
+  if(a>=100) s = Math.round(n).toString();
+  else if(a>=10) s = (Math.round(n*10)/10).toString();
+  else if(a>=1) s = (Math.round(n*100)/100).toString();
+  else if(a===0) s='0';
+  else s = Number(n.toPrecision(2)).toString();
+  return s;
+};
+const rng = (a,b,u) => (Math.abs(a-b) < 1e-9 ? fmt(a) : fmt(a)+'–'+fmt(b)) + (u?' '+u:'');
+function amtStr(lo,hi,base){
+  if(base==='mcg' && hi>=1000) return rng(lo/1000,hi/1000,'mg');
+  if(base==='mg' && hi<1 && hi>0) return rng(lo*1000,hi*1000,'mcg');
+  return rng(lo,hi,base);
+}
+
+/* calc line -> html (needs scalars) */
+function calcHtml(k, sc, drug, lineKey, paeds){
+  if(!k) return '';
+  const parts = k.u.split('/');
+  const base = parts[0];
+  const perKg = parts.includes('kg');
+  const time = parts.find(x=>x==='min'||x==='h'||x==='day');
+  if(perKg && !sc) return '<div class="calc"><span class="wnote">Enter weight to calculate</span></div>';
+  let scal = paeds ? 'TBW' : (k.s||'TBW');
+  let w = perKg ? (sc[scal]!=null ? sc[scal] : sc.TBW) : 1;
+  let fell = perKg && scal!=='TBW' && sc[scal]==null;
+  let lo = k.v[0]*w, hi = k.v[1]*w, capped=false;
+  if(k.cap!=null){ if(hi>k.cap){hi=k.cap;capped=true;} if(lo>k.cap) lo=k.cap; }
+  const bits = [];
+  if(!time){
+    bits.push(`<span class="res">${amtStr(lo,hi,base)}</span>`);
+    if(base==='mL'){ /* already a volume */ }
+    else (drug.cc||[]).slice(0,3).forEach(c=>{
+      const isUnits = c.u==='units';
+      if(isUnits !== (base==='units')) return;
+      const conv = base==='mcg'? 1/1000 : base==='g' ? 1000 : 1;
+      const vlo = lo*conv/c.v, vhi = hi*conv/c.v;
+      bits.push(`<span class="vol">${rng(vlo,vhi,'mL')} of ${esc(c.l)}</span>`);
+    });
+    if(drug.vial && base==='mg'){ bits.push(`<span class="vol">${Math.ceil(lo/drug.vial.mg)}${Math.ceil(hi/drug.vial.mg)!==Math.ceil(lo/drug.vial.mg)?'–'+Math.ceil(hi/drug.vial.mg):''} × ${esc(drug.vial.l)}</span>`); }
+  } else if(time==='day'){
+    bits.push(`<span class="res">${amtStr(lo,hi,base)}/day</span>`);
+  } else {
+    bits.push(`<span class="res">${amtStr(lo,hi,base)}/${time}</span>`);
+    if(base==='mL'){
+      if(time==='min') bits.push(`<span class="vol">${rng(lo*60,hi*60,'mL/h')}</span>`);
+    } else if(k.ic){
+      const key = drug.id+'|'+lineKey;
+      const ic = S.icOverride && S.icOverride[key]!=null ? S.icOverride[key] : k.ic;
+      const perH = time==='min'?60:1;
+      bits.push(`<span class="vol">${rng(lo*perH/ic,hi*perH/ic,'mL/h')}</span>`);
+      bits.push(`<span class="icin">@ <input type="number" step="any" inputmode="decimal" data-ic="${esc(key)}" value="${ic}"> ${esc(base)}/mL</span>`);
+      if(k.icl) bits.push(`<span class="wnote">(default ${esc(k.icl)})</span>`);
+    }
+  }
+  if(perKg) bits.push(`<span class="wnote">by ${scal}${fell?' → TBW (add height + sex)':''} ${fmt(w)} kg${capped?' · capped':''}</span>`);
+  else if(capped) bits.push('<span class="wnote">capped</span>');
+  return '<div class="calc">'+bits.join('')+'</div>';
+}
+S.icOverride = {};
+
+/* ---------------- toast ---------------- */
+let toastT;
+function toast(msg){
+  let t = $('#toast'); if(!t){ t=document.createElement('div'); t.id='toast'; t.className='toast'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.display='block'; clearTimeout(toastT); toastT=setTimeout(()=>t.style.display='none', 2600);
+}
+
+/* ---------------- routing ---------------- */
+function route(){
+  const h = location.hash.replace(/^#/,'') || 'drugs';
+  const [view, arg] = h.split('/');
+  $$('.topnav a, .tabbar a').forEach(a=>a.classList.toggle('on', a.dataset.v===(view==='drug'?'drugs':view)));
+  const m = $('#main');
+  if(view==='drugs'||view==='drug') renderDrugs(m, view==='drug'?decodeURIComponent(arg||''):null);
+  else if(view==='log') renderLog(m);
+  else if(view==='dash') renderDash(m);
+  else if(view==='settings') renderSettings(m);
+  else renderDrugs(m,null);
+  renderSyncPill();
+}
+window.addEventListener('hashchange', ()=>{ route(); if(!location.hash.startsWith('#drug/')) window.scrollTo(0,0); });
+
+/* =====================================================
+   DRUGS VIEW
+   ===================================================== */
+const CLASSES = ['All', ...Array.from(new Set(DRUGS.map(d=>d.c)))];
+const KW = {lipid:'last toxicity intralipid antidote', dantrolene:'mh malignant hyperthermia antidote', adrenaline:'anaphylaxis arrest epinephrine epi', sux:'scoline sch succinylcholine', naloxone:'opioid reversal narcan', flumazenil:'benzodiazepine reversal', sugammadex:'reversal roc', neostigmine:'reversal', methyleneblue:'methaemoglobinaemia methb', cacl:'hyperkalaemia hyperk calcium', cagluc:'hyperkalaemia hyperk calcium', insulin:'hyperkalaemia hyperk', bicarb:'tca acidosis', magnesium:'eclampsia pre-eclampsia torsades mgso4', oxytocin:'pph caesarean cs', carboprost:'pph hemabate', txa:'bleeding pph trauma', hydrocortisone:'adrenal crisis steroid', ondansetron:'ponv nausea', dexamethasone:'ponv steroid croup', lidocaine:'lignocaine xylocaine', gtn:'nitroglycerin uterine relaxation', cefazolin:'antibiotic prophylaxis', heparin:'ufh act', enoxaparin:'lmwh clexane', noradrenaline:'norepinephrine levophed pressor', phenylephrine:'spinal hypotension pressor', ephedrine:'pressor', metaraminol:'pressor'};
+function searchDrugs(q, cls){
+  q = q.trim().toLowerCase();
+  let list = DRUGS.filter(d => cls==='All' || d.c===cls);
+  if(!q) return list.slice().sort((a,b)=>a.n.localeCompare(b.n));
+  const scored = [];
+  for(const d of list){
+    const n=d.n.toLowerCase(), a=(d.a||'').toLowerCase();
+    let s=0;
+    if(n.startsWith(q)) s=100; else if(n.includes(q)) s=80;
+    else if(a.split(/[,;()]+/).some(x=>x.trim().startsWith(q))) s=70; else if(a.includes(q)) s=60;
+    else if(KW[d.id] && KW[d.id].split(' ').some(w=>w.startsWith(q))) s=90;
+    else if(d.c.toLowerCase().includes(q)) s=40;
+    else { const hay=[d.ind,d.mx,d.nt,d.ph].join(' ').toLowerCase(); if(new RegExp('\\b'+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b').test(hay)) s=30; else if(hay.includes(q)) s=20; }
+    if(s) scored.push([s,d]);
+  }
+  return scored.sort((x,y)=>y[0]-x[0]||x[1].n.localeCompare(y[1].n)).map(x=>x[1]);
+}
+function verifiedCount(){ return DRUGS.filter(d=>S.drugmeta[d.id]&&S.drugmeta[d.id].verified).length; }
+
+function patientBarHtml(){
+  const p=S.patient, sc=scalars();
+  const chips=[];
+  if(sc){
+    chips.push(`<span class="badge">TBW ${fmt(sc.TBW)} kg</span>`);
+    if(sc.BMI) chips.push(`<span class="badge">BMI ${fmt(sc.BMI)}</span>`);
+    if(sc.IBW) chips.push(`<span class="badge acc">IBW ${fmt(sc.IBW)} kg</span>`);
+    if(sc.LBW) chips.push(`<span class="badge acc">LBW ${fmt(sc.LBW)} kg</span>`);
+    if(sc.ABW) chips.push(`<span class="badge">AdjBW ${fmt(sc.ABW)} kg</span>`);
+    if(!sc.IBW) chips.push(`<span class="badge warn">Add height + sex for IBW/LBW dosing</span>`);
+  } else chips.push('<span class="faint tiny">Enter weight to see calculated doses (mg and mL)</span>');
+  return `<div class="card pt-bar">
+    <div class="pt-grid">
+      <div><label class="f">Weight kg</label><input id="pt-wt" type="number" inputmode="decimal" step="any" value="${esc(p.wt)}"></div>
+      <div><label class="f">Height cm</label><input id="pt-ht" type="number" inputmode="decimal" step="any" value="${esc(p.ht)}"></div>
+      <div><label class="f">Age y</label><input id="pt-age" type="number" inputmode="decimal" step="any" value="${esc(p.age)}"></div>
+      <div><label class="f">Sex</label><select id="pt-sex"><option value="">–</option><option value="M" ${p.sex==='M'?'selected':''}>M</option><option value="F" ${p.sex==='F'?'selected':''}>F</option></select></div>
+    </div>
+    <div class="pt-derived" id="pt-derived">${chips.join('')}${sc?' <button class="btn ghost sm" id="pt-clear">Clear</button>':''}</div>
+  </div>`;
+}
+
+function renderDrugs(m, id){
+  const open = id && DRUGS.find(d=>d.id===id);
+  m.innerHTML = `
+  <div class="drug-layout ${open?'detail-open':''}">
+    <div class="drug-side">
+      ${patientBarHtml()}
+      <div class="searchbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="dq" type="search" placeholder="Search drugs, classes, uses (e.g. LAST, MH)…" value="${esc(S.ui.drugQ)}" autocomplete="off"></div>
+      <div class="chips" id="dcls">${CLASSES.map(c=>`<button class="chip ${S.ui.drugCls===c?'on':''}" data-c="${esc(c)}">${esc(c)}</button>`).join('')}</div>
+      <div class="row tiny faint" style="margin-top:8px"><span id="dcount"></span><span class="spacer"></span><span>${verifiedCount()}/${DRUGS.length} verified by you</span></div>
+      <div class="drug-list" id="dlist"></div>
+    </div>
+    <div class="drug-detail-wrap" id="ddetail">${open? drugDetailHtml(open) : `<div class="card empty">Select a drug to see doses, onset/duration, pharmacology and contraindications.</div>`}</div>
+  </div>`;
+  renderDrugList(id);
+  bindPatientBar(id);
+  $('#dq').addEventListener('input', e=>{ S.ui.drugQ=e.target.value; renderDrugList(id); });
+  $('#dq').addEventListener('keydown', e=>{ if(e.key==='Enter'){ const f=searchDrugs(S.ui.drugQ,S.ui.drugCls)[0]; if(f) location.hash='#drug/'+f.id; }});
+  $('#dcls').addEventListener('click', e=>{ const b=e.target.closest('.chip'); if(!b) return; S.ui.drugCls=b.dataset.c; $$('#dcls .chip').forEach(x=>x.classList.toggle('on',x===b)); renderDrugList(id); });
+  if(open) bindDetail(open);
+}
+function renderDrugList(activeId){
+  const list = searchDrugs(S.ui.drugQ, S.ui.drugCls);
+  $('#dcount').textContent = list.length + ' drug' + (list.length===1?'':'s');
+  $('#dlist').innerHTML = list.length ? list.map(d=>{
+    const v = S.drugmeta[d.id]&&S.drugmeta[d.id].verified;
+    return `<a class="card drug-item ${d.id===activeId?'on':''}" href="#drug/${d.id}">
+      <div><div class="nm">${esc(d.n)}</div><div class="cl">${esc(d.c)}${d.a?' · '+esc(d.a):''}</div></div>
+      ${v?'<span class="badge good" title="Verified">✓</span>':''}
+      <span class="chev">›</span></a>`; }).join('') : '<div class="empty small">No matches</div>';
+}
+function bindPatientBar(id){
+  const upd = () => {
+    S.patient = {wt:$('#pt-wt').value, ht:$('#pt-ht').value, age:$('#pt-age').value, sex:$('#pt-sex').value};
+    LS.set('patient', S.patient);
+    const tmp=document.createElement('div'); tmp.innerHTML=patientBarHtml();
+    $('#pt-derived').innerHTML = $('#pt-derived',tmp).innerHTML; bindClear();
+    const d = id && DRUGS.find(x=>x.id===id); if(d){ $('#ddetail').innerHTML = drugDetailHtml(d); bindDetail(d); }
+  };
+  const bindClear = () => { const c=$('#pt-clear'); if(c) c.onclick=()=>{ S.patient={wt:'',ht:'',age:'',sex:''}; LS.set('patient',S.patient); route(); }; };
+  ['#pt-wt','#pt-ht','#pt-age'].forEach(s=>$(s).addEventListener('input', upd));
+  $('#pt-sex').addEventListener('change', upd);
+  bindClear();
+}
+function doseLinesHtml(lines, drug, sc, paeds){
+  if(!lines||!lines.length) return '<div class="faint small">—</div>';
+  return lines.map((l,i)=>`<div class="dose-line ${l.k&&l.k.x?'max':''}">
+    <div class="dose-ind">${l.k&&l.k.x?'⚠ ':''}${esc(l.i)}</div>
+    <div class="dose-txt">${esc(l.t)}</div>
+    ${l.k?calcHtml(l.k, sc, drug, (paeds?'p':'d')+i, paeds):''}
+  </div>`).join('');
+}
+function drugDetailHtml(d){
+  const sc = scalars(), meta = S.drugmeta[d.id]||{};
+  const age = parseFloat(S.patient.age);
+  let macHtml='';
+  if(d.mac && age>=1){
+    const mac = d.mac*Math.pow(10,-0.00269*(age-40));
+    macHtml = `<div class="notice info" style="margin-top:8px">Age-adjusted MAC at ${fmt(age)} y ≈ <b>&nbsp;${fmt(mac)}%&nbsp;</b> (Mapleson; from MAC40 ${d.mac}%)</div>`;
+  }
+  return `<div class="card pad">
+    <a href="#drugs" class="btn ghost sm back-link" style="margin:-4px 0 6px -8px">‹ All drugs</a>
+    <div class="dd-head">
+      <div style="flex:1;min-width:200px"><h1 class="dd-title">${esc(d.n)}</h1>${d.a?`<div class="dd-aka">${esc(d.a)}</div>`:''}</div>
+      <span class="badge">${esc(d.c)}</span>
+      ${meta.verified?`<span class="badge good">✓ Verified ${esc(meta.verified)}</span>`:'<span class="badge warn">Unverified draft</span>'}
+    </div>
+    <div class="sec small muted"><b>Presentation:</b> ${esc(d.conc)}</div>
+    ${macHtml}
+    <h3>Adult dosing</h3>
+    ${doseLinesHtml(d.d, d, sc, false)}
+    <div class="sec maxbox"><b>⚠ Max / toxic dose</b><div style="margin-top:3px">${esc(d.mx||'—')}</div></div>
+    <div class="sec tiles">
+      <div class="tile"><div class="k">Onset</div><div class="v">${esc(d.on||'—')}</div></div>
+      <div class="tile"><div class="k">Duration</div><div class="v">${esc(d.du||'—')}</div></div>
+    </div>
+    <h3>Paediatric</h3>
+    ${doseLinesHtml(d.p, d, sc, true)}
+    <h3>Pharmacology</h3><div class="prose">${esc(d.ph)}</div>
+    <h3>Indications</h3><div class="prose">${esc(d.ind)}</div>
+    <h3>Contraindications / cautions</h3><div class="prose">${esc(d.ci)}</div>
+    ${d.nt?`<h3>Notes</h3><div class="prose">${esc(d.nt)}</div>`:''}
+    <h3>My notes</h3>
+    <textarea id="dnote" placeholder="Local concentrations, departmental protocol differences, corrections…">${esc(meta.note||'')}</textarea>
+    <div class="verify-bar">
+      ${meta.verified?`<button class="btn sm" id="dunverify">Mark as unverified</button>`:`<button class="btn sm primary" id="dverify">✓ Mark verified today</button>`}
+      <span class="tiny faint">Basis: ${esc(d.src)}</span>
+    </div>
+    <div class="tiny faint" style="margin-top:10px">Draft reference compiled by AI. Not a substitute for your formulary, product information or clinical judgement. Weight-based maths assumes the inputs above are correct.</div>
+  </div>`;
+}
+function bindDetail(d){
+  const note = $('#dnote');
+  let nt; note.addEventListener('input', ()=>{ clearTimeout(nt); nt=setTimeout(()=>{ setMeta(d.id,{note:note.value}); }, 500); });
+  const v=$('#dverify'), u=$('#dunverify');
+  if(v) v.onclick=()=>{ setMeta(d.id,{verified:todayStr()}); toast('Marked verified'); route(); };
+  if(u) u.onclick=()=>{ setMeta(d.id,{verified:null}); route(); };
+  $$('#ddetail input[data-ic]').forEach(inp=>inp.addEventListener('change', ()=>{
+    const val=parseFloat(inp.value); if(val>0){ S.icOverride[inp.dataset.ic]=val; } else delete S.icOverride[inp.dataset.ic];
+    $('#ddetail').innerHTML = drugDetailHtml(d); bindDetail(d);
+  }));
+}
+function setMeta(id, patch){
+  S.drugmeta[id] = Object.assign({}, S.drugmeta[id]||{}, patch, {updatedAt:nowIso()});
+  saveMeta();
+}
+
+/* =====================================================
+   LOG VIEW
+   ===================================================== */
+const live = () => S.entries.filter(e=>!e.deleted);
+function entryTitle(e){ return e.proc + (e.site?' – '+e.site:''); }
+function entrySub(e){
+  const b=[];
+  if(e.side) b.push(e.side);
+  if(e.cat==='airway'){ if(e.device) b.push(e.device); if(e.laryngo&&e.laryngo!=='Not applicable') b.push(e.laryngo); if(e.cl) b.push('CL '+e.cl); }
+  if(e.cat==='neuraxial'){ if(e.level) b.push(e.level); if(e.needle) b.push(e.needle); }
+  if(e.cat==='block'&&e.la) b.push(e.la);
+  if(e.ageVal!==''&&e.ageVal!=null) b.push(e.ageVal+' '+(e.ageUnit==='m'?'mo':'y'));
+  if(e.asa) b.push('ASA '+e.asa+(e.emerg?'E':''));
+  if(e.specialty) b.push(e.specialty);
+  return b.join(' · ');
+}
+function renderLog(m){
+  const all = live();
+  m.innerHTML = `
+    <div class="row" style="margin-bottom:10px"><h1 style="margin:0">Procedure log</h1><span class="spacer"></span>
+      <button class="btn primary fab" id="newentry">＋ New entry</button></div>
+    <div class="searchbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="lq" type="search" placeholder="Search procedures, history, notes…" value="${esc(S.ui.logQ)}"></div>
+    <div class="chips" id="lcats"><button class="chip ${S.ui.logCat==='All'?'on':''}" data-c="All">All (${all.length})</button>
+      ${CATS.map(c=>`<button class="chip ${S.ui.logCat===c.id?'on':''}" data-c="${c.id}">${esc(c.name)} (${all.filter(e=>e.cat===c.id).length})</button>`).join('')}</div>
+    <div id="llist"></div>`;
+  const draw = () => {
+    const q=S.ui.logQ.trim().toLowerCase();
+    let list = all.filter(e=>S.ui.logCat==='All'||e.cat===S.ui.logCat);
+    if(q) list = list.filter(e=>[e.proc,e.site,e.side,e.device,e.history,e.notes,e.specialty,e.la,e.complications&&e.complications.join(' '),e.compOther].join(' ').toLowerCase().includes(q));
+    list.sort((a,b)=> (b.date||'').localeCompare(a.date||'') || (b.createdAt||'').localeCompare(a.createdAt||''));
+    if(!list.length){ $('#llist').innerHTML = `<div class="card empty" style="margin-top:12px">${all.length?'No matching entries.':'No entries yet. Tap <b>＋ New entry</b> after your next procedure.'}</div>`; return; }
+    let html='', cur='';
+    for(const e of list){
+      const mk=(e.date||'').slice(0,7);
+      if(mk!==cur){ cur=mk; const n=list.filter(x=>(x.date||'').slice(0,7)===mk).length; html+=`<div class="log-month">${esc(monthLabel(mk))} · ${n}</div>`; }
+      const badges=[];
+      if(e.sup) badges.push(`<span class="badge">${esc(e.sup)}</span>`);
+      if(e.uss) badges.push('<span class="badge acc">USS</span>');
+      if(e.outcome==='Failed'||e.outcome==='Abandoned') badges.push(`<span class="badge crit">${esc(e.outcome)}</span>`);
+      else if(e.outcome) badges.push('<span class="badge good">Success</span>');
+      if(e.attempts>1) badges.push(`<span class="badge">${e.attempts} attempts</span>`);
+      if((e.complications&&e.complications.length)||e.compOther) badges.push('<span class="badge warn">Complication</span>');
+      if(e.catheter) badges.push('<span class="badge">Catheter</span>');
+      html+=`<div class="card entry" data-id="${e.id}">
+        <div class="cat-bar" style="background:${CAT[e.cat]?CAT[e.cat].color:'var(--ink-3)'}"></div>
+        <div class="e-main"><div class="e-title">${esc(entryTitle(e))}</div><div class="e-sub">${esc(entrySub(e))}</div><div class="e-badges">${badges.join('')}</div></div>
+        <div class="e-date">${esc(fmtDate(e.date))}</div></div>`;
+    }
+    $('#llist').innerHTML = html;
+  };
+  draw();
+  $('#lq').addEventListener('input', e=>{ S.ui.logQ=e.target.value; draw(); });
+  $('#lcats').addEventListener('click', e=>{ const b=e.target.closest('.chip'); if(!b) return; S.ui.logCat=b.dataset.c; $$('#lcats .chip').forEach(x=>x.classList.toggle('on',x===b)); draw(); });
+  $('#llist').addEventListener('click', e=>{ const c=e.target.closest('.entry'); if(c) openEntry(S.entries.find(x=>x.id===c.dataset.id)); });
+  $('#newentry').onclick = ()=>openEntry(null);
+}
+function monthLabel(mk){ if(!mk) return 'Undated'; const [y,mo]=mk.split('-'); return new Date(+y,+mo-1,1).toLocaleDateString(undefined,{month:'long',year:'numeric'}); }
+function fmtDate(d){ if(!d) return ''; const [y,mo,da]=d.split('-'); return new Date(+y,+mo-1,+da).toLocaleDateString(undefined,{day:'numeric',month:'short'}); }
+
+/* ---------- entry form ---------- */
+function openEntry(existing){
+  const last = LS.get('lastEntryDefaults', {});
+  const e = existing ? JSON.parse(JSON.stringify(existing)) : {
+    id:uid(), date:todayStr(), cat:last.cat||'airway', proc:'', site:'', side:'', uss:false, ns:false, catheter:false,
+    device:'', laryngo:'', cl:'', adj:[], level:'', needle:'', approach:'', lor:'', la:'', drug:'',
+    ageVal:'', ageUnit:'y', sex:'', asa:'', emerg:false, urgency:'Elective', history:'', specialty:'',
+    sup:last.sup||'', attempts:1, outcome:'Successful', complications:[], compOther:'', notes:''
+  };
+  const bg=document.createElement('div'); bg.className='sheet-bg';
+  bg.innerHTML = `<div class="sheet" role="dialog" aria-modal="true">
+    <div class="sheet-head"><h2>${existing?'Edit entry':'New entry'}</h2><span class="spacer"></span><button class="btn ghost sm" data-x>Cancel</button></div>
+    <div class="sheet-body" id="ef"></div>
+    <div class="sheet-foot">${existing?'<button class="btn danger" data-del>Delete</button>':''}<span class="spacer"></span>${existing?'':'<button class="btn" data-saveadd>Save + another</button>'}<button class="btn primary" data-save>Save</button></div>
+  </div>`;
+  document.body.appendChild(bg); document.body.style.overflow='hidden';
+  const close = () => { bg.remove(); document.body.style.overflow=''; };
+  bg.addEventListener('click', ev=>{ if(ev.target===bg) close(); });
+  $('[data-x]',bg).onclick = close;
+
+  const segHtml = (name, opts, val) => `<div class="seg" data-seg="${name}">${opts.map(o=>`<button type="button" class="${String(val)===String(o)?'on':''}" data-v="${esc(o)}">${esc(o)}</button>`).join('')}</div>`;
+  const opt = (arr,val,blank='–') => `<option value="">${blank}</option>`+arr.map(o=>`<option ${o===val?'selected':''}>${esc(o)}</option>`).join('');
+  const checks = (name, arr, vals) => `<div class="checks">${arr.map(o=>`<label><input type="checkbox" data-chk="${name}" value="${esc(o)}" ${vals&&vals.includes(o)?'checked':''}>${esc(o)}</label>`).join('')}</div>`;
+
+  function draw(){
+    const procs = PROCS[e.cat]||[];
+    if(!procs.includes(e.proc)) e.proc = '';
+    let spec='';
+    if(e.cat==='airway') spec = `
+      <div class="grid2"><div class="field"><label class="f">Device / size</label><input type="text" data-k="device" value="${esc(e.device)}" placeholder="e.g. 7.0 cuffed ETT, LMA Supreme 4"></div>
+      <div class="field"><label class="f">Laryngoscopy</label><select data-k="laryngo">${opt(LARYNGO,e.laryngo)}</select></div></div>
+      <div class="field"><label class="f">Cormack–Lehane grade</label>${segHtml('cl',CL,e.cl)}</div>
+      <div class="field"><label class="f">Adjuncts / technique</label>${checks('adj',AW_ADJ,e.adj)}</div>`;
+    else if(e.cat==='neuraxial') spec = `
+      <div class="grid2"><div class="field"><label class="f">Level</label><input type="text" data-k="level" value="${esc(e.level)}" placeholder="e.g. L3/4"></div>
+      <div class="field"><label class="f">Needle</label><input type="text" data-k="needle" value="${esc(e.needle)}" placeholder="e.g. 25G Whitacre, 16G Tuohy"></div></div>
+      <div class="grid2"><div class="field"><label class="f">Approach</label>${segHtml('approach',['Midline','Paramedian'],e.approach)}</div>
+      <div class="field"><label class="f">LOR (epidural)</label>${segHtml('lor',['Saline','Air','N/A'],e.lor)}</div></div>
+      <div class="field"><label class="f">Drug / dose</label><input type="text" data-k="drug" value="${esc(e.drug)}" placeholder="e.g. 2.4 mL 0.5% heavy bupi + fentanyl 15 mcg"></div>
+      <div class="checks"><label><input type="checkbox" data-b="uss" ${e.uss?'checked':''}>USS pre-scan</label><label><input type="checkbox" data-b="catheter" ${e.catheter?'checked':''}>Catheter</label></div>`;
+    else if(e.cat==='block') spec = `
+      <div class="field"><label class="f">Side</label>${segHtml('side',['Left','Right','Bilateral','Midline'],e.side)}</div>
+      <div class="field"><label class="f">Local anaesthetic / volume</label><input type="text" data-k="la" value="${esc(e.la)}" placeholder="e.g. 20 mL 0.375% ropivacaine"></div>
+      <div class="checks"><label><input type="checkbox" data-b="uss" ${e.uss?'checked':''}>USS-guided</label><label><input type="checkbox" data-b="ns" ${e.ns?'checked':''}>Nerve stimulator</label><label><input type="checkbox" data-b="catheter" ${e.catheter?'checked':''}>Catheter</label></div>`;
+    else if(e.cat==='vascular') spec = `
+      ${SITES[e.proc]?`<div class="field"><label class="f">Site</label>${segHtml('site',SITES[e.proc],e.site)}</div>`:''}
+      <div class="field"><label class="f">Side</label>${segHtml('side',['Left','Right'],e.side)}</div>
+      <div class="field"><label class="f">Device</label><input type="text" data-k="device" value="${esc(e.device)}" placeholder="e.g. 20G arterial, 7Fr 4-lumen 16 cm"></div>
+      <div class="checks"><label><input type="checkbox" data-b="uss" ${e.uss?'checked':''}>USS-guided</label></div>`;
+    else spec = `<div class="field"><label class="f">Details</label><input type="text" data-k="device" value="${esc(e.device)}" placeholder="Technique, findings, agents…"></div>
+      ${e.cat==='other'?'<div class="checks"><label><input type="checkbox" data-b="uss" '+(e.uss?'checked':'')+'>Ultrasound used</label></div>':''}`;
+
+    $('#ef',bg).innerHTML = `
+      <div class="fs"><div class="grid2">
+        <div class="field"><label class="f">Date</label><input type="date" data-k="date" value="${esc(e.date)}"></div>
+        <div class="field"><label class="f">Specialty / surgery (optional)</label><input type="text" data-k="specialty" value="${esc(e.specialty)}" placeholder="e.g. Ortho – TKR"></div></div>
+        <label class="f">Category</label>
+        <div class="chips" style="flex-wrap:wrap" data-cat>${CATS.map(c=>`<button type="button" class="chip ${e.cat===c.id?'on':''}" data-c="${c.id}"><span class="sw" style="background:${c.color};margin-right:6px;vertical-align:-1px"></span>${esc(c.name)}</button>`).join('')}</div>
+        <div class="field" style="margin-top:12px"><label class="f">Procedure${e.cat==='block'?' (block type)':''}</label><select data-k="proc">${opt(procs,e.proc,'Select…')}</select></div>
+      </div>
+      <div class="fs"><div class="fs-t">Details</div>${spec}</div>
+      <div class="fs"><div class="fs-t">Patient (anonymised)</div>
+        <div class="grid3">
+          <div class="field"><label class="f">Age</label><input type="number" inputmode="decimal" data-k="ageVal" value="${esc(e.ageVal)}"></div>
+          <div class="field"><label class="f">Unit</label>${segHtml('ageUnit',['y','m'],e.ageUnit)}</div>
+          <div class="field"><label class="f">Sex</label>${segHtml('sex',['M','F'],e.sex)}</div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label class="f">ASA</label>${segHtml('asa',['1','2','3','4','5'],e.asa)}</div>
+          <div class="field"><label class="f">Urgency</label>${segHtml('urgency',['Elective','Emergency'],e.urgency)}</div>
+        </div>
+        <div class="field"><label class="f">Pertinent history</label><textarea data-k="history" placeholder="e.g. BMI 42, OSA on CPAP; anticipated difficult airway (no identifiers)">${esc(e.history)}</textarea></div>
+        <div class="tiny faint">Do not enter names, NRIC, MRN, DOB or other identifiers.</div>
+      </div>
+      <div class="fs"><div class="fs-t">Performance</div>
+        <div class="field"><label class="f">Supervision / role</label><select data-k="sup">${opt(SUPERVISION,e.sup)}</select></div>
+        <div class="grid2">
+          <div class="field"><label class="f">Attempts</label><input type="number" inputmode="numeric" min="1" data-k="attempts" value="${esc(e.attempts)}"></div>
+          <div class="field"><label class="f">Outcome</label><select data-k="outcome">${opt(['Successful','Failed','Abandoned'],e.outcome)}</select></div>
+        </div>
+        <div class="field"><label class="f">Complications</label>${checks('complications',COMPLIC[e.cat]||[],e.complications)}
+          <input type="text" style="margin-top:8px" data-k="compOther" value="${esc(e.compOther)}" placeholder="Other complication"></div>
+        <div class="field"><label class="f">Notes / learning points</label><textarea data-k="notes">${esc(e.notes)}</textarea></div>
+      </div>`;
+  }
+  draw();
+  const ef = $('#ef',bg);
+  ef.addEventListener('input', ev=>{ const t=ev.target; if(t.dataset.k){ e[t.dataset.k] = t.type==='number' ? (t.value===''?'':(t.dataset.k==='attempts'?parseInt(t.value,10)||1:parseFloat(t.value))) : t.value; } });
+  ef.addEventListener('change', ev=>{
+    const t=ev.target;
+    if(t.dataset.k==='proc'){ e.proc=t.value; e.site=''; draw(); return; }
+    if(t.dataset.k==='laryngo'||t.dataset.k==='sup'||t.dataset.k==='outcome'){ e[t.dataset.k]=t.value; }
+    if(t.dataset.b){ e[t.dataset.b]=t.checked; }
+    if(t.dataset.chk){ const k=t.dataset.chk; e[k]=$$(`input[data-chk="${k}"]:checked`,ef).map(x=>x.value); }
+  });
+  ef.addEventListener('click', ev=>{
+    const c=ev.target.closest('[data-cat] .chip'); if(c){ if(e.cat!==c.dataset.c){ e.cat=c.dataset.c; e.proc=''; e.site=''; e.complications=[]; e.uss = e.cat==='block'; } draw(); return; }
+    const sb=ev.target.closest('.seg button'); if(sb){ const seg=sb.parentElement.dataset.seg; e[seg] = (String(e[seg])===sb.dataset.v && seg!=='ageUnit') ? '' : sb.dataset.v; if(seg==='urgency') e.emerg = e.urgency==='Emergency'; $$('button',sb.parentElement).forEach(b=>b.classList.toggle('on', b.dataset.v===String(e[seg]))); }
+  });
+  const save = (again) => {
+    if(!e.proc){ toast('Select a procedure'); return false; }
+    if(!e.date){ toast('Set a date'); return false; }
+    e.updatedAt = nowIso(); if(!e.createdAt) e.createdAt = e.updatedAt;
+    const i = S.entries.findIndex(x=>x.id===e.id);
+    if(i>=0) S.entries[i]=e; else S.entries.push(e);
+    LS.set('lastEntryDefaults', {cat:e.cat, sup:e.sup});
+    saveEntries();
+    toast(existing?'Entry updated':'Entry saved');
+    close();
+    if(again){ const nx = {cat:e.cat, sup:e.sup}; LS.set('lastEntryDefaults', nx); openEntry(null); }
+    if(location.hash.startsWith('#log')||location.hash.startsWith('#dash')) route();
+    return true;
+  };
+  $('[data-save]',bg).onclick = ()=>save(false);
+  const sa=$('[data-saveadd]',bg); if(sa) sa.onclick=()=>save(true);
+  const del=$('[data-del]',bg); if(del) del.onclick=()=>{
+    if(!confirmInline(del)) return;
+    const i=S.entries.findIndex(x=>x.id===e.id);
+    if(i>=0){ S.entries[i] = {id:e.id, deleted:true, updatedAt:nowIso(), createdAt:S.entries[i].createdAt}; saveEntries(); }
+    toast('Entry deleted'); close(); route();
+  };
+}
+/* two-tap confirm (avoids blocking browser dialogs) */
+function confirmInline(btn){
+  if(btn.dataset.armed){ return true; }
+  btn.dataset.armed='1'; const old=btn.textContent; btn.textContent='Tap again to confirm';
+  setTimeout(()=>{ if(btn.isConnected){ delete btn.dataset.armed; btn.textContent=old; } }, 3000);
+  return false;
+}
+
+/* =====================================================
+   DASHBOARD
+   ===================================================== */
+function rangeStart(r){
+  const d=new Date(); d.setHours(0,0,0,0);
+  if(r==='30d'){ d.setDate(d.getDate()-29); }
+  else if(r==='3m'){ d.setMonth(d.getMonth()-2,1); }
+  else if(r==='6m'){ d.setMonth(d.getMonth()-5,1); }
+  else if(r==='12m'){ d.setMonth(d.getMonth()-11,1); }
+  else return null;
+  return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+}
+function monthKeys(fromKey, toKey){
+  const out=[]; let [y,m]=fromKey.split('-').map(Number); const [ty,tm]=toKey.split('-').map(Number);
+  while(y<ty || (y===ty && m<=tm)){ out.push(y+'-'+String(m).padStart(2,'0')); m++; if(m>12){m=1;y++;} if(out.length>240) break; }
+  return out;
+}
+function renderDash(m){
+  const all = live();
+  const r = S.ui.dashRange, start = rangeStart(r);
+  const inR = all.filter(e=>!start || (e.date||'')>=start);
+  const thisMonth = todayStr().slice(0,7);
+  const nMonth = all.filter(e=>(e.date||'').startsWith(thisMonth)).length;
+  const withOutcome = inR.filter(e=>e.outcome);
+  const succ = withOutcome.filter(e=>e.outcome==='Successful').length;
+  const ussElig = inR.filter(e=>e.cat==='block'||e.cat==='vascular');
+  const ussPct = ussElig.length ? Math.round(100*ussElig.filter(e=>e.uss).length/ussElig.length) : null;
+  const ranges=[['30d','30 days'],['3m','3 months'],['6m','6 months'],['12m','12 months'],['all','All time']];
+  m.innerHTML = `
+    <div class="row" style="margin-bottom:12px"><h1 style="margin:0">Dashboard</h1><span class="spacer"></span></div>
+    <div class="chips" id="drange" style="margin-bottom:14px">${ranges.map(([k,l])=>`<button class="chip ${r===k?'on':''}" data-r="${k}">${l}</button>`).join('')}</div>
+    ${all.length? '' : '<div class="notice info" style="margin-bottom:14px">No entries yet — log procedures in the Log tab and they will appear here.</div>'}
+    <div class="kpis">
+      <div class="card kpi"><div class="k">Entries</div><div class="v">${inR.length}</div><div class="s">${esc(ranges.find(x=>x[0]===r)[1])}</div></div>
+      <div class="card kpi"><div class="k">This month</div><div class="v">${nMonth}</div><div class="s">${esc(monthLabel(thisMonth))}</div></div>
+      <div class="card kpi"><div class="k">Success rate</div><div class="v">${withOutcome.length?Math.round(100*succ/withOutcome.length)+'%':'–'}</div><div class="s">${succ}/${withOutcome.length} with outcome</div></div>
+      <div class="card kpi"><div class="k">USS-guided</div><div class="v">${ussPct==null?'–':ussPct+'%'}</div><div class="s">blocks + vascular</div></div>
+    </div>
+    <div class="dash-grid">
+      <div class="card pad"><h2>Totals by category</h2><div id="cattot"></div></div>
+      <div class="card pad"><h2>Supervision level</h2><div id="suptot"></div></div>
+      <div class="card pad wide"><div class="row"><h2 style="margin:0">Trend over time</h2><span class="spacer"></span><button class="btn sm" id="tbltog">${S.ui.showTable?'Hide table':'Show table'}</button></div>
+        <div class="legend" id="trlegend"></div><div class="chart-wrap" id="trend"></div><div id="trtable"></div></div>
+      <div class="card pad wide"><h2>Breakdown</h2><div class="chips" id="bdcats" style="margin-bottom:10px"></div><div id="bd"></div></div>
+    </div>`;
+  $('#drange').onclick = e=>{ const b=e.target.closest('.chip'); if(!b) return; S.ui.dashRange=b.dataset.r; renderDash(m); };
+
+  // category totals
+  const catCounts = CATS.map(c=>({c, n:inR.filter(e=>e.cat===c.id).length}));
+  const maxC = Math.max(1,...catCounts.map(x=>x.n));
+  $('#cattot').innerHTML = catCounts.map(({c,n})=>`<div class="hbar" title="${esc(c.name)}: ${n}"><div class="lab"><span class="sw" style="background:${c.color}"></span>${esc(c.name)}</div><div class="track"><div class="fill" style="width:${100*n/maxC}%;background:${c.color}"></div></div><div class="cnt">${n}</div></div>`).join('');
+
+  // supervision
+  const supC = SUPERVISION.map(s=>({s,n:inR.filter(e=>e.sup===s).length})); const unset = inR.filter(e=>!e.sup).length;
+  if(unset) supC.push({s:'Not recorded', n:unset});
+  const maxS = Math.max(1,...supC.map(x=>x.n));
+  $('#suptot').innerHTML = supC.map(({s,n})=>`<div class="hbar" title="${esc(s)}: ${n}"><div class="lab">${esc(s)}</div><div class="track"><div class="fill" style="width:${100*n/maxS}%;background:var(--s1)"></div></div><div class="cnt">${n}</div></div>`).join('');
+
+  // trend
+  drawTrend(all, start);
+  $('#tbltog').onclick = ()=>{ S.ui.showTable=!S.ui.showTable; renderDash(m); };
+
+  // breakdown
+  const presentCats = CATS.filter(c=>inR.some(e=>e.cat===c.id));
+  if(!S.ui.dashCat || !presentCats.find(c=>c.id===S.ui.dashCat)) S.ui.dashCat = presentCats[0] ? presentCats[0].id : 'airway';
+  $('#bdcats').innerHTML = CATS.map(c=>`<button class="chip ${S.ui.dashCat===c.id?'on':''}" data-c="${c.id}">${esc(c.name)}</button>`).join('');
+  $('#bdcats').onclick = e=>{ const b=e.target.closest('.chip'); if(!b) return; S.ui.dashCat=b.dataset.c; renderDash(m); };
+  const sub = inR.filter(e=>e.cat===S.ui.dashCat);
+  const map = {};
+  sub.forEach(e=>{ const k=entryTitle(e); map[k]=map[k]||{n:0,s:0,o:0,u:0}; map[k].n++; if(e.outcome){map[k].o++; if(e.outcome==='Successful') map[k].s++;} if(e.uss) map[k].u++; });
+  const rows = Object.entries(map).sort((a,b)=>b[1].n-a[1].n);
+  const maxB = Math.max(1,...rows.map(r=>r[1].n));
+  const col = CAT[S.ui.dashCat].color;
+  $('#bd').innerHTML = rows.length ? rows.map(([k,v])=>`<div class="hbar" title="${esc(k)}: ${v.n}${v.o?` · ${Math.round(100*v.s/v.o)}% success`:''}"><div class="lab">${esc(k)}</div><div class="track"><div class="fill" style="width:${100*v.n/maxB}%;background:${col}"></div></div><div class="cnt">${v.n}</div></div>`).join('')
+    + `<div class="tbl-scroll" style="margin-top:12px"><table class="data"><thead><tr><th>Procedure</th><th>Total</th><th>Success</th><th>USS</th></tr></thead><tbody>${rows.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v.n}</td><td>${v.o?Math.round(100*v.s/v.o)+'%':'–'}</td><td>${v.u}</td></tr>`).join('')}</tbody></table></div>`
+    : '<div class="faint small">No entries in this category for the selected range.</div>';
+  if(S.ui.dashCat==='airway' && sub.length){
+    const lc={}; sub.forEach(e=>{ if(e.laryngo) lc[e.laryngo]=(lc[e.laryngo]||0)+1; });
+    const ents=Object.entries(lc); if(ents.length) $('#bd').innerHTML += `<h3>Laryngoscopy</h3>`+ents.sort((a,b)=>b[1]-a[1]).map(([k,n])=>`<div class="kv"><span>${esc(k)}</span><b class="num">${n}</b></div>`).join('');
+  }
+}
+function drawTrend(all, start){
+  const host = $('#trend');
+  const today = todayStr().slice(0,7);
+  let fromKey;
+  if(start) fromKey = start.slice(0,7);
+  else { const ds = all.map(e=>e.date).filter(Boolean).sort(); fromKey = ds.length ? ds[0].slice(0,7) : today; }
+  let keys = monthKeys(fromKey, today);
+  let bucket = k => k, labelOf = k => { const [y,mo]=k.split('-'); return new Date(+y,+mo-1,1).toLocaleDateString(undefined,{month:'short'}); };
+  if(S.ui.dashRange==='30d'){ // daily buckets would be noisy: use weeks
+    const s=new Date(start); keys=[]; for(let i=0;i<5;i++){ const d=new Date(s.getTime()+i*7*864e5); keys.push(d.toISOString().slice(0,10)); }
+    bucket = date => { const idx=Math.min(4,Math.floor((new Date(date)-new Date(start))/(7*864e5))); return keys[idx]; };
+    labelOf = k => new Date(k).toLocaleDateString(undefined,{day:'numeric',month:'short'});
+  } else if(keys.length>24){
+    const q = k => { const [y,mo]=k.split('-').map(Number); return y+'-Q'+(Math.floor((mo-1)/3)+1); };
+    keys = Array.from(new Set(keys.map(q))); bucket = date => q(date.slice(0,7)); labelOf = k => k.replace('-',' ');
+  }
+  const useMonth = S.ui.dashRange!=='30d' && !(keys[0]&&keys[0].includes('Q'));
+  const data = keys.map(k=>({k, by:Object.fromEntries(CATS.map(c=>[c.id,0])), t:0}));
+  const idx = Object.fromEntries(keys.map((k,i)=>[k,i]));
+  all.forEach(e=>{ if(!e.date) return; if(start && e.date<start) return; const b = useMonth ? e.date.slice(0,7) : bucket(e.date); const i=idx[b]; if(i==null) return; data[i].by[e.cat]=(data[i].by[e.cat]||0)+1; data[i].t++; });
+  const present = CATS.filter(c=>data.some(d=>d.by[c.id]>0));
+  $('#trlegend').innerHTML = present.length ? present.map(c=>`<span><span class="sw" style="background:${c.color}"></span>${esc(c.name)}</span>`).join('') : '';
+  const W = Math.max(320, host.clientWidth||640), H = 220, padL=30, padR=8, padT=10, padB=26;
+  const maxT = Math.max(1, ...data.map(d=>d.t));
+  const rawStep = maxT/4, mag = Math.pow(10, Math.floor(Math.log10(Math.max(1,rawStep))));
+  const step = Math.max(1, [1,2,5,10].map(x=>x*mag).find(x=>x>=rawStep) || 10*mag);
+  const nice = step*4;
+  const iw = W-padL-padR, ih = H-padT-padB, n=data.length;
+  const slot = iw/n, bw = Math.max(4, Math.min(36, slot*0.62));
+  const y = v => padT + ih - (v/nice)*ih;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Procedures per period, stacked by category"><g class="grid">`;
+  const ticks = 4; for(let i=0;i<=ticks;i++){ const v=nice*i/ticks; svg+=`<line x1="${padL}" x2="${W-padR}" y1="${y(v)}" y2="${y(v)}"/>`; }
+  svg += '</g><g class="axis">';
+  for(let i=0;i<=ticks;i++){ const v=nice*i/ticks; svg+=`<text x="${padL-6}" y="${y(v)+4}" text-anchor="end">${fmt(v)}</text>`; }
+  const every = Math.ceil(n/ (W<500?6:12));
+  data.forEach((d,i)=>{ if(i%every===0||i===n-1) svg+=`<text x="${padL+slot*i+slot/2}" y="${H-8}" text-anchor="middle">${esc(labelOf(d.k))}</text>`; });
+  svg += '</g><g>';
+  data.forEach((d,i)=>{
+    const x = padL+slot*i+(slot-bw)/2; let acc=0;
+    const segs = present.filter(c=>d.by[c.id]>0);
+    segs.forEach((c,si)=>{
+      const v=d.by[c.id]; const y1=y(acc+v), y0=y(acc); acc+=v;
+      const gap = si<segs.length-1 ? 0 : 0;
+      const h = Math.max(0, y0-y1-(si>0?2:0));
+      const top = si===segs.length-1;
+      if(top && h>4){ const r=Math.min(4,bw/2); svg+=`<path d="M${x},${y1+h+(si>0?0:0)} V${y1+r} Q${x},${y1} ${x+r},${y1} H${x+bw-r} Q${x+bw},${y1} ${x+bw},${y1+r} V${y1+h} Z" fill="${c.color}"/>`; }
+      else svg+=`<rect x="${x}" y="${y1}" width="${bw}" height="${h}" fill="${c.color}"/>`;
+      void gap;
+    });
+    svg+=`<rect class="hit" data-i="${i}" x="${padL+slot*i}" y="${padT}" width="${slot}" height="${ih}" fill="transparent"/>`;
+  });
+  svg += '</g></svg>';
+  host.innerHTML = svg + '<div class="tip" style="display:none"></div>';
+  const tip = $('.tip',host);
+  const show = (i, cx) => {
+    const d=data[i]; if(!d) return;
+    tip.innerHTML = `<div class="tt">${esc(useMonth?monthLabel(d.k):labelOf(d.k))} · ${d.t}</div>` + (d.t? present.filter(c=>d.by[c.id]).map(c=>`<div class="tr"><span><span class="sw" style="background:${c.color}"></span>${esc(c.name)}</span><b class="num">${d.by[c.id]}</b></div>`).join('') : '<div class="faint">No entries</div>');
+    tip.style.display='block';
+    const hostW = host.clientWidth; const tw = tip.offsetWidth;
+    let left = cx + 12; if(left+tw>hostW) left = cx - tw - 12; if(left<0) left=0;
+    tip.style.left=left+'px'; tip.style.top='8px';
+  };
+  host.querySelectorAll('.hit').forEach(r=>{
+    const handler = ev => { const box=host.getBoundingClientRect(); const cx=(ev.touches?ev.touches[0].clientX:ev.clientX)-box.left; show(+r.dataset.i, cx); };
+    r.addEventListener('mousemove', handler); r.addEventListener('touchstart', handler, {passive:true});
+  });
+  host.addEventListener('mouseleave', ()=>tip.style.display='none');
+  if(S.ui.showTable){
+    $('#trtable').innerHTML = `<div class="tbl-scroll" style="margin-top:10px"><table class="data"><thead><tr><th>Period</th>${CATS.map(c=>`<th>${esc(c.name)}</th>`).join('')}<th>Total</th></tr></thead><tbody>${data.map(d=>`<tr><td>${esc(useMonth?monthLabel(d.k):labelOf(d.k))}</td>${CATS.map(c=>`<td>${d.by[c.id]||0}</td>`).join('')}<td><b>${d.t}</b></td></tr>`).join('')}</tbody></table></div>`;
+  }
+}
+
+/* =====================================================
+   SETTINGS + BACKUP
+   ===================================================== */
+function renderSettings(m){
+  const st=S.settings, sy=S.sync;
+  m.innerHTML = `
+  <h1>Settings</h1>
+  <div class="card pad set-sec">
+    <h2>Sync between iPhone and laptop</h2>
+    <p class="small muted" style="margin-top:0">Your log and drug notes sync to a JSON file in a <b>private</b> GitHub repository. Everything works offline; changes sync automatically when you're back online. Set this up once on each device with the same details.</p>
+    <div class="grid2">
+      <div class="field"><label class="f">GitHub username</label><input type="text" id="s-owner" value="${esc(st.owner)}" autocapitalize="off" autocorrect="off" placeholder="your-username"></div>
+      <div class="field"><label class="f">Private data repo</label><input type="text" id="s-repo" value="${esc(st.repo)}" autocapitalize="off" autocorrect="off" placeholder="anaes-kit-data"></div>
+    </div>
+    <div class="field"><label class="f">Fine-grained access token</label><input type="password" id="s-token" value="${esc(st.token)}" autocapitalize="off" autocorrect="off" placeholder="github_pat_…"></div>
+    <div class="field"><label class="f">File path</label><input type="text" id="s-path" value="${esc(st.path)}" autocapitalize="off"></div>
+    <div class="checks" style="margin-bottom:12px"><label><input type="checkbox" id="s-auto" ${st.auto?'checked':''}>Sync automatically</label></div>
+    <div class="row"><button class="btn primary" id="s-save">Save + sync now</button><span class="spacer"></span><span class="small muted" id="s-status">${esc(syncLabel())}</span></div>
+    <details style="margin-top:12px"><summary class="small" style="cursor:pointer;font-weight:600">How to set this up (5 min)</summary>
+      <ol class="steps">
+        <li>On github.com, create a new <b>private</b> repository, e.g. <code>anaes-kit-data</code> (tick “Add a README”).</li>
+        <li>Settings → Developer settings → Personal access tokens → <b>Fine-grained tokens</b> → Generate new token.</li>
+        <li>Repository access: <b>Only select repositories</b> → choose <code>anaes-kit-data</code>. Permissions → Repository → <b>Contents: Read and write</b>. Set an expiry you're comfortable with (e.g. 1 year).</li>
+        <li>Copy the token, paste it above with your username and repo name, then Save + sync. Repeat on your other device.</li>
+      </ol>
+      <div class="small muted">The token stays only on your device and can only touch that one repo. If a device is lost, revoke the token on GitHub.</div>
+    </details>
+  </div>
+  <div class="card pad set-sec">
+    <h2>Backup &amp; export</h2>
+    <div class="row">
+      <button class="btn" id="b-json">Export backup (JSON)</button>
+      <button class="btn" id="b-csv">Export log (CSV)</button>
+      <label class="btn" style="cursor:pointer">Import backup<input type="file" id="b-imp" accept="application/json,.json" style="display:none"></label>
+    </div>
+    <div class="tiny faint" style="margin-top:8px">Import merges with existing data (newest edit wins) — it never wipes entries.</div>
+  </div>
+  <div class="card pad set-sec">
+    <h2>Data</h2>
+    <div class="kv"><span>Log entries</span><b class="num">${live().length}</b></div>
+    <div class="kv"><span>Drugs verified by you</span><b class="num">${verifiedCount()} / ${DRUGS.length}</b></div>
+    <div class="kv"><span>App version</span><b>${APP_VERSION}</b></div>
+    <div class="kv"><span>Offline ready</span><b id="offl">${'serviceWorker' in navigator && navigator.serviceWorker.controller ? 'Yes' : 'Not yet (open once online, then reload)'}</b></div>
+    <div class="row" style="margin-top:12px"><button class="btn danger" id="b-wipe">Erase data on this device</button></div>
+  </div>
+  <div class="card pad set-sec small muted">
+    <b>Drug reference disclaimer.</b> The drug data is an AI-compiled draft based on standard references and named guidelines (ASRA LAST 2020, AAGBI MH 2020/EMHG 2024, RCUK anaphylaxis 2021/2024, 4th PONV consensus 2020, and others listed per drug). Doses, concentrations and licensing vary by country and institution. Verify each entry against your local formulary before relying on it, and use “Mark verified” to track what you have checked.
+  </div>`;
+  $('#s-save').onclick = ()=>{
+    S.settings = {owner:$('#s-owner').value.trim(), repo:$('#s-repo').value.trim(), token:$('#s-token').value.trim(), path:$('#s-path').value.trim()||'anaes-kit-data.json', auto:$('#s-auto').checked};
+    LS.set('settings', S.settings); doSync(true);
+  };
+  $('#b-json').onclick = ()=>download('anaes-kit-backup-'+todayStr()+'.json', JSON.stringify(payload(),null,1), 'application/json');
+  $('#b-csv').onclick = ()=>download('anaes-kit-log-'+todayStr()+'.csv', toCsv(), 'text/csv');
+  $('#b-imp').onchange = async ev=>{
+    const f=ev.target.files[0]; if(!f) return;
+    try{ const obj=JSON.parse(await f.text()); const before=live().length; mergeInto(obj); LS.set('entries',S.entries); LS.set('drugmeta',S.drugmeta); scheduleSync(); toast('Imported — '+(live().length-before)+' new entries'); route(); }
+    catch(e){ toast('Import failed: not a valid backup'); }
+  };
+  $('#b-wipe').onclick = ev=>{ if(!confirmInline(ev.currentTarget)) return; ['entries','drugmeta','sync','lastEntryDefaults'].forEach(k=>localStorage.removeItem('ak.'+k)); S.entries=[]; S.drugmeta={}; S.sync={lastSync:null,status:'off',msg:''}; toast('Local data erased (synced copy untouched)'); route(); };
+}
+function download(name, text, type){
+  const blob = new Blob([text], {type}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();}, 500);
+}
+function toCsv(){
+  const cols = [['date','Date'],['cat','Category'],['proc','Procedure'],['site','Site'],['side','Side'],['uss','USS'],['ns','Nerve stim'],['catheter','Catheter'],['device','Device/details'],['laryngo','Laryngoscopy'],['cl','CL grade'],['adj','Adjuncts'],['level','Level'],['needle','Needle'],['approach','Approach'],['lor','LOR'],['la','LA/volume'],['drug','Drug/dose'],['ageVal','Age'],['ageUnit','Age unit'],['sex','Sex'],['asa','ASA'],['urgency','Urgency'],['specialty','Specialty'],['history','Pertinent history'],['sup','Supervision'],['attempts','Attempts'],['outcome','Outcome'],['complications','Complications'],['compOther','Other complication'],['notes','Notes']];
+  const q = v => { if(v==null) v=''; if(Array.isArray(v)) v=v.join('; '); if(typeof v==='boolean') v=v?'Y':''; if(cols && v===undefined) v=''; v=String(v); return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; };
+  const rows = live().slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  return [cols.map(c=>c[1]).join(',')].concat(rows.map(e=>cols.map(([k])=> k==='cat' ? q(CAT[e.cat]?CAT[e.cat].name:e.cat) : q(e[k])).join(','))).join('\n');
+}
+
+/* =====================================================
+   SYNC (GitHub contents API, private repo)
+   ===================================================== */
+function payload(){ return {app:'anaes-kit', version:1, exportedAt:nowIso(), entries:S.entries, drugmeta:S.drugmeta}; }
+function mergeInto(remote){
+  let changed=false;
+  if(remote && Array.isArray(remote.entries)){
+    const map = new Map(S.entries.map(e=>[e.id,e]));
+    for(const r of remote.entries){ if(!r||!r.id) continue; const l=map.get(r.id); if(!l || (r.updatedAt||'')>(l.updatedAt||'')){ map.set(r.id,r); changed=true; } }
+    S.entries = Array.from(map.values());
+  }
+  if(remote && remote.drugmeta && typeof remote.drugmeta==='object'){
+    for(const [id,r] of Object.entries(remote.drugmeta)){ const l=S.drugmeta[id]; if(!l || (r.updatedAt||'')>(l.updatedAt||'')){ S.drugmeta[id]=r; changed=true; } }
+  }
+  return changed;
+}
+const b64enc = str => { const bytes=new TextEncoder().encode(str); let bin=''; for(let i=0;i<bytes.length;i+=0x8000) bin+=String.fromCharCode.apply(null, bytes.subarray(i,i+0x8000)); return btoa(bin); };
+const b64dec = b64 => { const bin=atob(b64.replace(/\s/g,'')); const bytes=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i); return new TextDecoder().decode(bytes); };
+function syncConfigured(){ const s=S.settings; return !!(s.owner&&s.repo&&s.token); }
+function setSync(status,msg){ S.sync.status=status; S.sync.msg=msg||''; if(status==='ok') S.sync.lastSync=nowIso(); LS.set('sync',S.sync); renderSyncPill(); const el=$('#s-status'); if(el) el.textContent=syncLabel(); }
+function syncLabel(){
+  const s=S.sync;
+  if(!syncConfigured()) return 'Not set up';
+  if(s.status==='busy') return 'Syncing…';
+  if(s.status==='err') return 'Sync error: '+s.msg;
+  if(s.status==='offline') return 'Offline — will sync later';
+  if(s.lastSync) return 'Synced '+timeAgo(s.lastSync);
+  return 'Ready';
+}
+function timeAgo(iso){ const d=(Date.now()-new Date(iso))/1000; if(d<60) return 'just now'; if(d<3600) return Math.floor(d/60)+' min ago'; if(d<86400) return Math.floor(d/3600)+' h ago'; return new Date(iso).toLocaleDateString(); }
+function renderSyncPill(){
+  const p=$('#syncpill'); if(!p) return;
+  const s=S.sync; let cls='', txt;
+  if(!syncConfigured()){ txt='Local only'; }
+  else if(s.status==='busy'){ cls='busy'; txt='Syncing'; }
+  else if(s.status==='err'){ cls='err'; txt='Sync error'; }
+  else if(s.status==='offline'||!navigator.onLine){ txt='Offline'; }
+  else { cls='ok'; txt = s.lastSync ? 'Synced' : 'Ready'; }
+  p.innerHTML = `<span class="dot ${cls}"></span>${txt}`;
+  p.title = syncLabel();
+}
+let syncTimer=null, syncing=false, syncAgain=false;
+function scheduleSync(){ if(!syncConfigured()||!S.settings.auto) return; clearTimeout(syncTimer); syncTimer=setTimeout(()=>doSync(false), 2500); }
+async function gh(method, body){
+  const s=S.settings; const url=`https://api.github.com/repos/${encodeURIComponent(s.owner)}/${encodeURIComponent(s.repo)}/contents/${s.path.split('/').map(encodeURIComponent).join('/')}`;
+  const res = await fetch(url, {method, cache:'no-store', headers:{'Authorization':'Bearer '+s.token,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28', ...(body?{'Content-Type':'application/json'}:{})}, body: body?JSON.stringify(body):undefined});
+  return res;
+}
+async function doSync(manual){
+  if(!syncConfigured()){ if(manual) toast('Fill in username, repo and token'); return; }
+  if(!navigator.onLine){ setSync('offline'); if(manual) toast('Offline — will sync when online'); return; }
+  if(syncing){ syncAgain=true; return; }
+  syncing=true; setSync('busy');
+  try{
+    for(let attempt=0; attempt<3; attempt++){
+      let sha=null, remote=null;
+      const r = await gh('GET');
+      if(r.status===200){ const j=await r.json(); sha=j.sha; let txt=j.content?b64dec(j.content):'';
+        if(!txt && j.download_url){ const rr=await fetch(j.download_url,{cache:'no-store',headers:{'Authorization':'Bearer '+S.settings.token}}); txt=await rr.text(); }
+        try{ remote = txt?JSON.parse(txt):null; }catch(e){ throw new Error('remote file is not valid JSON'); } }
+      else if(r.status===404){ remote=null; }
+      else if(r.status===401) throw new Error('token rejected (401)');
+      else if(r.status===403) throw new Error('no permission (403) — check token repo access');
+      else throw new Error('GitHub '+r.status);
+      const localBefore = JSON.stringify({e:S.entries,m:S.drugmeta});
+      if(remote) mergeInto(remote);
+      LS.set('entries',S.entries); LS.set('drugmeta',S.drugmeta);
+      const merged = {e:S.entries,m:S.drugmeta};
+      const remoteSame = remote && JSON.stringify({e:sortById(remote.entries||[]),m:remote.drugmeta||{}})===JSON.stringify({e:sortById(merged.e),m:merged.m});
+      if(!remoteSame){
+        const body = {message:'Anaes Kit sync '+nowIso(), content:b64enc(JSON.stringify(payload())), ...(sha?{sha}:{})};
+        const p = await gh('PUT', body);
+        if(p.status===409||p.status===422){ continue; } // file changed underneath — retry merge
+        if(p.status===404) throw new Error('repo not found — check username/repo and token access');
+        if(!p.ok) throw new Error('GitHub write '+p.status);
+      }
+      setSync('ok');
+      if(localBefore!==JSON.stringify({e:S.entries,m:S.drugmeta})){ const h=location.hash; if(!document.querySelector('.sheet-bg') && (h.startsWith('#log')||h.startsWith('#dash')||h===''||h.startsWith('#drug'))) route(); }
+      if(manual) toast('Synced');
+      break;
+    }
+  }catch(err){ setSync(navigator.onLine?'err':'offline', String(err.message||err)); if(manual) toast('Sync failed: '+(err.message||err)); }
+  finally{ syncing=false; if(syncAgain){ syncAgain=false; scheduleSync(); } }
+}
+function sortById(arr){ return arr.slice().sort((a,b)=>(a.id||'').localeCompare(b.id||'')); }
+window.addEventListener('online', ()=>{ renderSyncPill(); scheduleSync(); });
+window.addEventListener('offline', ()=>{ renderSyncPill(); });
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible' && syncConfigured() && S.settings.auto) doSync(false); });
+
+/* ---------------- boot ---------------- */
+function boot(){
+  let framed=false; try{ framed = window.self!==window.top; }catch(e){ framed=true; }
+  if(framed){ const n=document.createElement('div'); n.className='notice'; n.style.cssText='margin:10px 16px 0;'; n.innerHTML='<span>⚠</span><span><b>Preview only.</b> Sync, export and offline mode are blocked inside this preview. Install the GitHub Pages version (see setup guide) for real use — data entered here stays here.</span>'; document.querySelector('.topbar').after(n); }
+  $('#syncpill').onclick = ()=>{ if(syncConfigured()) doSync(true); else location.hash='#settings'; };
+  route();
+  if(syncConfigured() && S.settings.auto) setTimeout(()=>doSync(false), 600);
+  if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')){
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  }
+}
+// expose for tests
+window.__AK = {S, scalars, calcHtml, mergeInto, searchDrugs, toCsv, payload, b64enc, b64dec};
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();
+
+</script>
+</body>
+</html>
